@@ -22,6 +22,9 @@ class SearchViewModel() : ViewModel() {
             is SearchEvent.OnSearch -> {
                 executeSearch()
             }
+            is SearchEvent.OnWordClick -> {
+
+            }
             is SearchEvent.OnSearchFocusChange -> {
                 state = state.copy(
                     isHintVisible = !event.isFocused && state.query.isBlank()
@@ -38,7 +41,7 @@ class SearchViewModel() : ViewModel() {
             )
             state = state.copy(
                 words = dummy.getWords().filter {
-                    state.query == it.word.lowercase()
+                    it.word.contains(state.query, true)
                 }.map {
                     WordItemUiState(it)
                 },

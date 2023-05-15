@@ -4,4 +4,5 @@ data class Word(
     val id: String,
     val word: String,
     val meaning: String,
+    val audio: String
 )

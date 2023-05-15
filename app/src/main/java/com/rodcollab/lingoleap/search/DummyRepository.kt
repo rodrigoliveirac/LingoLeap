@@ -9,17 +9,20 @@ class DummyRepository {
         Word(
             id = UUID.randomUUID().toString(),
             word = "Hello",
-            meaning = "Type of greeting"
+            meaning = "Type of greeting",
+            audio = "https://ssl.gstatic.com/dictionary/static/sounds/20200429/hello--_gb_1.mp3"
         ),
         Word(
             id = UUID.randomUUID().toString(),
             word = "Hello",
-            meaning = "Type of greeting"
+            meaning = "Type of greeting",
+            audio = "https://ssl.gstatic.com/dictionary/static/sounds/20200429/hello--_gb_1.mp3"
         ),
         Word(
             id = UUID.randomUUID().toString(),
             word = "Hello",
-            meaning = "Type of greeting"
+            meaning = "Type of greeting",
+            audio = "https://ssl.gstatic.com/dictionary/static/sounds/20200429/hello--_gb_1.mp3"
         )
     )
 
