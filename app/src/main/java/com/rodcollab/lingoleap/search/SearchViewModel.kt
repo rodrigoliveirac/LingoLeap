@@ -9,13 +9,17 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel() : ViewModel() {
 
-    private val dummy: DummyRepository = DummyRepository()
+    private val service by lazy {
+        DictionaryApi.retrofitService
+    }
+
 
     var state by mutableStateOf(SearchState())
         private set
 
+
     fun onEvent(event: SearchEvent) {
-        when(event) {
+        when (event) {
             is SearchEvent.OnQueryChange -> {
                 state = state.copy(query = event.query)
             }
@@ -24,7 +28,7 @@ class SearchViewModel() : ViewModel() {
             }
             is SearchEvent.OnWordClick -> {
                 state = state.copy(
-                    audio = event.word.audio,
+                    audio = event.word.phonetics[0].audio,
                     openDialog = true
                 )
             }
@@ -48,11 +52,10 @@ class SearchViewModel() : ViewModel() {
                 words = emptyList()
             )
             state = state.copy(
-                words = dummy.getWords().filter {
-                    it.word.contains(state.query, true)
-                }.map {
-                    WordItemUiState(it)
-                },
+                words = service
+                    .getWord(state.query).map { infoItem ->
+                        WordItemUiState(element = infoItem)
+                    },
                 isSearching = false,
                 query = ""
             )

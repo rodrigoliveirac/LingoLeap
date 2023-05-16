@@ -46,15 +46,18 @@ fun WordItem(
                 Column(
                     modifier = Modifier.align(Alignment.CenterVertically),
                 ) {
+
                     Text(
                         text = item.word,
                         style = MaterialTheme.typography.body1,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+
                     Spacer(modifier = modifier.height(8.dp))
+
                     Text(
-                        text = item.meaning,
+                        text = item.meanings?.size.toString(),
                         style = MaterialTheme.typography.body2
                     )
                 }
