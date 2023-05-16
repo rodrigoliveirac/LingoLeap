@@ -26,69 +26,6 @@ import kotlinx.coroutines.*
 fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
     // on below line we are creating a variable for our audio url
 
-
-    val audioUrl = "https://ssl.gstatic.com/dictionary/static/sounds/20200429/hello--_gb_1.mp3"
-
-    val audioAttributes = AudioAttributes.Builder()
-        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-        .setUsage(AudioAttributes.USAGE_MEDIA)
-        .build()
-
-    val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
-
-    var progress by remember { mutableStateOf(0f) }
-
-    var isPlaying by remember { mutableStateOf(false) }
-
-    DisposableEffect(audioUrl) {
-
-
-        mediaPlayer.apply {
-            setDataSource(audioUrl)
-            setAudioAttributes(audioAttributes)
-            prepare()
-        }
-
-        onDispose {
-            mediaPlayer.release()
-
-        }
-    }
-    DisposableEffect(Unit) {
-
-        isPlaying = mediaPlayer.isPlaying
-
-        onDispose {
-            isPlaying = false
-        }
-    }
-
-    if (isPlaying) {
-        LaunchedEffect(Unit) {
-            while (true) {
-
-                progress = mediaPlayer.currentPosition.toFloat()
-                delay(1000 / 30)
-
-            }
-        }
-    }
-
-
-    LaunchedEffect(mediaPlayer) {
-
-        mediaPlayer.setOnCompletionListener {
-
-            progress = 0f
-            isPlaying = false
-
-        }
-    }
-
-
-    val openDialog = remember { mutableStateOf(false) }
-
-
     val state = viewModel.state
     val keyBoardController = LocalSoftwareKeyboardController.current
 
@@ -115,18 +52,74 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                 WordItem(
                     wordItemUiState = word,
                     onClick = {
-                        openDialog.value = true
+                        viewModel.onEvent(SearchEvent.OnWordClick(word.element))
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         }
-        if (openDialog.value) {
+        if (state.openDialog) {
 
             val dialogWidth = 200.dp
             val dialogHeight = 50.dp
 
-            Dialog(onDismissRequest = { openDialog.value = false }) {
+            Dialog(onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
+
+                val audioAttributes = AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+
+
+                var progress by remember { mutableStateOf(0f) }
+
+                var isPlaying by remember { mutableStateOf(false) }
+                val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
+
+                DisposableEffect(state.audio) {
+
+
+                    mediaPlayer.apply {
+                        setDataSource(state.audio)
+                        setAudioAttributes(audioAttributes)
+                        prepare()
+                    }
+
+                    onDispose {
+                        mediaPlayer.release()
+
+                    }
+                }
+                DisposableEffect(Unit) {
+
+                    isPlaying = mediaPlayer.isPlaying
+
+                    onDispose {
+                        isPlaying = false
+                    }
+                }
+
+                if (isPlaying) {
+                    LaunchedEffect(Unit) {
+                        while (true) {
+
+                            progress = mediaPlayer.currentPosition.toFloat()
+                            delay(1000 / 30)
+
+                        }
+                    }
+                }
+
+
+                LaunchedEffect(mediaPlayer) {
+
+                    mediaPlayer.setOnCompletionListener {
+
+                        progress = 0f
+                        isPlaying = false
+
+                    }
+                }
                 Box(
                     Modifier
                         .size(dialogWidth, dialogHeight)

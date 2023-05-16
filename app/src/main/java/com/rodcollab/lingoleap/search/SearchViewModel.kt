@@ -23,11 +23,19 @@ class SearchViewModel() : ViewModel() {
                 executeSearch()
             }
             is SearchEvent.OnWordClick -> {
-
+                state = state.copy(
+                    audio = event.word.audio,
+                    openDialog = true
+                )
             }
             is SearchEvent.OnSearchFocusChange -> {
                 state = state.copy(
                     isHintVisible = !event.isFocused && state.query.isBlank()
+                )
+            }
+            is SearchEvent.OpenDialog -> {
+                state = state.copy(
+                    openDialog = event.openDialog
                 )
             }
         }
