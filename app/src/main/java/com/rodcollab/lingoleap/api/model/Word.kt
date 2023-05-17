@@ -3,7 +3,7 @@ import com.squareup.moshi.Json
 
 data class Word(
     @Json(name = "meanings")
-    val meanings: List<Meaning>?,
+    val meanings: List<Meaning>,
     @Json(name = "origin")
     val origin: String?,
     @Json(name = "phonetic")

@@ -14,7 +14,7 @@ class SearchViewModel() : ViewModel() {
     }
 
 
-    var state by mutableStateOf(SearchState())
+    var state by mutableStateOf(SearchState(infoItem = InfoItemClicked()))
         private set
 
 
@@ -28,14 +28,23 @@ class SearchViewModel() : ViewModel() {
             }
             is SearchEvent.OnWordClick -> {
 
-                state = state.copy(wordItemClicked = event.word.word)
+                state.infoItem = state.infoItem.copy(
+                    word = event.word.word,
+                    meaning = event.word.meanings[0].definitions[0].definition
+                        ?: "no definitions for this word :("
+                )
+
 
                 event.word.phonetics.onEach {
-                    if(it.audio?.isNotBlank() == true) {
-                        state = state.copy(
+                    if (it.audio?.isNotBlank() == true) {
+                        state.let { currentState ->
+                            state = currentState.copy(openDialog = true)
+                            state.infoItem = currentState.infoItem.copy(audio = it.audio)
+                        }
+                        state.infoItem = state.infoItem.copy(
                             audio = it.audio,
-                            openDialog = true,
-                        )
+
+                            )
                     }
                 }
 
