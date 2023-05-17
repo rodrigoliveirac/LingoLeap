@@ -6,5 +6,6 @@ data class SearchState(
     val isSearching:Boolean = false,
     val words: List<WordItemUiState> = emptyList(),
     val openDialog: Boolean = false,
-    val audio: String = ""
+    val audio: String = "",
+    val wordItemClicked: String = ""
 )

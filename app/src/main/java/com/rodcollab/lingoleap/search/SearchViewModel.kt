@@ -28,14 +28,17 @@ class SearchViewModel() : ViewModel() {
             }
             is SearchEvent.OnWordClick -> {
 
+                state = state.copy(wordItemClicked = event.word.word)
+
                 event.word.phonetics.onEach {
                     if(it.audio?.isNotBlank() == true) {
                         state = state.copy(
                             audio = it.audio,
-                            openDialog = true
+                            openDialog = true,
                         )
                     }
                 }
+
             }
             is SearchEvent.OnSearchFocusChange -> {
                 state = state.copy(
