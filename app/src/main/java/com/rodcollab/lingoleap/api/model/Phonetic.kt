@@ -5,5 +5,5 @@ data class Phonetic(
     @Json(name = "text")
     val text: String?,
     @Json(name = "audio")
-    val audio: String?,
+    val audio: String?
 )
