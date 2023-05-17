@@ -4,12 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.rodcollab.lingoleap.search.SearchScreen
 import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,27 +18,23 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LingoLeapTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
+                val scaffoldState = rememberScaffoldState()
+
+                Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    scaffoldState = scaffoldState,
                 ) {
-                    Greeting("Android")
+                    SearchScreen(modifier = Modifier.fillMaxSize().padding(it))
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     LingoLeapTheme {
-        Greeting("Android")
+
     }
 }
