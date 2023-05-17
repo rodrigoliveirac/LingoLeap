@@ -4,9 +4,11 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,7 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.*
 import com.rodcollab.lingoleap.R
@@ -60,9 +65,6 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
         }
         if (state.openDialog) {
 
-            val dialogWidth = 200.dp
-            val dialogHeight = 50.dp
-
             Dialog(onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
 
                 val audioAttributes = AudioAttributes.Builder()
@@ -76,11 +78,11 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                 var isPlaying by remember { mutableStateOf(false) }
                 val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
 
-                DisposableEffect(state.audio) {
+                DisposableEffect(state.infoItem.audio) {
 
 
                     mediaPlayer.apply {
-                        setDataSource(state.audio)
+                        setDataSource(state.infoItem.audio)
                         setAudioAttributes(audioAttributes)
                         prepare()
                     }
@@ -122,47 +124,86 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                 }
                 Box(
                     Modifier
-                        .size(dialogWidth, dialogHeight)
-                        .background(Color.White)
+                        .sizeIn()
+                        .background(Color.White, RoundedCornerShape(8.dp))
+
                 ) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                            .padding(16.dp)
                     ) {
-                        IconButton(
-                            onClick = {
-                                Log.d("isPlaying", isPlaying.toString())
-
-                                isPlaying = if (isPlaying) {
-                                    mediaPlayer.pause()
-                                    false
-                                } else {
-                                    mediaPlayer.start()
-                                    true
-                                }
-
-                            }
+                        Text(text = state.infoItem.word.replaceFirstChar { it.uppercase() }, fontSize = 24.sp)
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Text(
+                            text = "Definition: ${state.infoItem.meaning}", fontSize = 16.sp,
+                            color = Color.Gray,
+                            fontStyle = FontStyle.Italic
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp)
+                                .align(Alignment.Start)
                         ) {
-                            Icon(
-                                painter = painterResource(id = setIcon(isPlaying)),
-                                contentDescription = "Play",
-                                tint = MaterialTheme.colors.primary
+                            IconButton(
+                                onClick = {
+                                    Log.d("isPlaying", isPlaying.toString())
+
+                                    isPlaying = if (isPlaying) {
+                                        mediaPlayer.pause()
+                                        false
+                                    } else {
+                                        mediaPlayer.start()
+                                        true
+                                    }
+
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = setIcon(isPlaying)),
+                                    contentDescription = "Play",
+                                    tint = MaterialTheme.colors.primary
+                                )
+                            }
+
+                            Slider(
+                                value = progress,
+                                onValueChange = { progress = it },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                colors = SliderDefaults.colors(
+                                    thumbColor = MaterialTheme.colors.primary
+                                ),
+                                valueRange = 0f..mediaPlayer.duration.toFloat()
                             )
                         }
 
-                        Slider(
-                            value = progress,
-                            onValueChange = { progress = it },
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            colors = SliderDefaults.colors(
-                                thumbColor = MaterialTheme.colors.primary
-                            ),
-                            valueRange = 0f..mediaPlayer.duration.toFloat()
-                        )
+                                .align(Alignment.End)
+                                .clickable { },
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = {}
+                            ) {
+                                Icon(
+                                    painterResource(id = R.drawable.ic_bookmark),
+                                    contentDescription = "Bookmark",
+                                    tint = Color.Gray
+                                )
+                            }
+                            Text(
+                                "Save",
+                                color = Color.Gray
+                            )
+                            Spacer(Modifier.size(24.dp))
+                        }
                     }
                 }
             }
@@ -175,5 +216,83 @@ fun setIcon(isPlaying: Boolean): Int {
         R.drawable.ic_pause
     } else {
         R.drawable.ic_play
+    }
+}
+
+@Preview
+@Composable
+fun DialogPreview() {
+    Box(
+        Modifier
+            .sizeIn()
+            .background(Color.White, RoundedCornerShape(8.dp))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center)
+                .padding(16.dp)
+        ) {
+            Text("Hello", fontSize = 24.sp)
+            Spacer(Modifier.size(8.dp))
+            Text(
+                text = "Definition: Used as a greeting or to begin a phone conversation.",
+                fontSize = 16.sp,
+                color = Color.Gray,
+                fontStyle = FontStyle.Italic
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .align(Alignment.Start)
+            ) {
+                IconButton(
+                    onClick = {}
+                ) {
+                    Icon(
+                        painter = painterResource(id = setIcon(false)),
+                        contentDescription = "Play",
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+
+                Slider(
+                    value = 0f,
+                    onValueChange = { },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colors.primary
+                    ),
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.End)
+                    .clickable { },
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = {}
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_bookmark),
+                        contentDescription = "Bookmark",
+                        tint = Color.Gray
+                    )
+                }
+                Text(
+                    "SAVE",
+                    color = Color.Gray
+                )
+                Spacer(Modifier.size(24.dp))
+            }
+        }
     }
 }
