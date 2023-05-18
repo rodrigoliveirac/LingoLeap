@@ -200,7 +200,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                             }
                             Text(
                                 "Save",
-                                color = Color.Gray
+                                color = ifWordIsSaved(state.infoItem.saved)
                             )
                             Spacer(Modifier.size(24.dp))
                         }
@@ -208,6 +208,14 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                 }
             }
         }
+    }
+}
+
+fun ifWordIsSaved(value: Boolean): Color {
+    return if (value) {
+        Color.Magenta
+    } else {
+        Color.Gray
     }
 }
 
