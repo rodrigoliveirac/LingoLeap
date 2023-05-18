@@ -1,7 +1,5 @@
 package com.rodcollab.lingoleap.search
 
-import com.rodcollab.lingoleap.api.model.Word
-
 sealed class SearchEvent {
     data class OnQueryChange(val query: String) : SearchEvent()
     object OnSearch : SearchEvent()
