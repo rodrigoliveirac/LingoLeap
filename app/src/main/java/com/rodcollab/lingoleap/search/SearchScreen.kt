@@ -29,7 +29,6 @@ import kotlinx.coroutines.*
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
-    // on below line we are creating a variable for our audio url
 
     val state = viewModel.state
     val keyBoardController = LocalSoftwareKeyboardController.current
