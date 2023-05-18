@@ -185,7 +185,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.End)
-                                .clickable { },
+                                .clickable { viewModel.onToggleSaveWord(state.infoItem) },
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -195,7 +195,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                                 Icon(
                                     painterResource(id = R.drawable.ic_bookmark),
                                     contentDescription = "Bookmark",
-                                    tint = Color.Gray
+                                    tint = ifWordIsSaved(state.infoItem.saved)
                                 )
                             }
                             Text(
