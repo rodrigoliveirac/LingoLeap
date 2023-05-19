@@ -29,7 +29,7 @@ import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: SearchViewModel by viewModels<SearchViewModel> {
+    private val viewModel: SearchViewModel by viewModels {
         val db = AppDatabase.getInstance(this.applicationContext)
         val repository = WordsSavedRepositoryImpl(db)
         SearchViewModel.MyViewModelFactory(repository)
