@@ -93,10 +93,23 @@ class SearchViewModel() : ViewModel() {
         }
     }
 
-    fun onToggleSaveWord(word: InfoItemClicked) {
+    fun onResume() {
         viewModelScope.launch {
-           saveWord(word.word)
-            Log.d("savedWords", wordsSavedRepository.getSavedWords().toString())
+            _state.value.infoItem.let { itemClicked ->
+                _state.value = SearchState(
+                    query = _state.value.query,
+                    isHintVisible = _state.value.isHintVisible,
+                    isSearching = _state.value.isSearching,
+                    words = _state.value.words,
+                    openDialog = _state.value.openDialog,
+                    infoItem = InfoItemClicked(
+                        word = itemClicked.word,
+                        meaning = itemClicked.meaning,
+                        audio = itemClicked.audio,
+                        saved = wordsSavedRepository.getSavedWords()
+                            .any { itemClicked.word == it.name })
+                )
+            }
         }
     }
 }
