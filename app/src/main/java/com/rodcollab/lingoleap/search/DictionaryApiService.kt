@@ -1,6 +1,6 @@
 package com.rodcollab.lingoleap.search
 
-import com.rodcollab.lingoleap.api.model.Word
+import com.rodcollab.lingoleap.api.model.InfoWord
 import com.squareup.moshi.Moshi
 import retrofit2.Retrofit
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -21,7 +21,7 @@ private val retrofit = Retrofit.Builder()
 
 interface DictionaryApiService {
     @GET("{word}")
-    suspend fun getWord(@Path("word") word: String?) : List<Word>
+    suspend fun getWord(@Path("word") word: String?) : List<InfoWord>
 }
 
 object DictionaryApi {

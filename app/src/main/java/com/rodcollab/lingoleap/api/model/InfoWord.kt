@@ -1,7 +1,7 @@
 package com.rodcollab.lingoleap.api.model
 import com.squareup.moshi.Json
 
-data class Word(
+data class InfoWord(
     @Json(name = "meanings")
     val meanings: List<Meaning>,
     @Json(name = "origin")
