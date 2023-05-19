@@ -1,27 +1,27 @@
 package com.rodcollab.lingoleap.saved
 
 import android.util.Log
+import com.rodcollab.lingoleap.core.database.AppDatabase
+import com.rodcollab.lingoleap.core.database.SavedWord
 import com.rodcollab.lingoleap.search.WordSaved
 
-class WordsSavedRepositoryImpl : WordsSavedRepository {
+class WordsSavedRepositoryImpl(appDatabase: AppDatabase) : WordsSavedRepository {
 
-    private val words = mutableListOf<WordSaved>(
-        WordSaved(name = "hello")
-    )
+    private val dao = appDatabase.savedWordDao()
 
     override suspend fun unsavedWord(name: String) {
-        val word = words.find { it.name == name }
-        words.remove(word)
+        dao.unsaved(name)
+        Log.d("delete_word", name)
     }
 
     override suspend fun savedWord(name: String) {
 
-        val savedWord = WordSaved(
+        val savedWord = SavedWord(
             name = name,
         )
-        words.add(savedWord)
-        Log.d("hello", savedWord.toString())
+        dao.savedWord(savedWord)
+        Log.d("saved_word", savedWord.name)
     }
 
-    override suspend fun getSavedWords(): List<WordSaved> = words
+    override suspend fun getSavedWords(): List<WordSaved> = dao.fetchSavedWords()
 }
