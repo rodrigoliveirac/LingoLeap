@@ -18,7 +18,7 @@ data class InfoItemClicked(
 
 data class Word(
     val name: String,
-    val arrayInformation: List<com.rodcollab.lingoleap.api.model.Word>,
+    val arrayInformation: List<com.rodcollab.lingoleap.api.model.InfoWord>,
     val saved: Boolean
 )
 

@@ -28,9 +28,9 @@ import kotlinx.coroutines.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
+fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
 
-    val state = viewModel.state
+    val state by viewModel.state.collectAsState()
     val keyBoardController = LocalSoftwareKeyboardController.current
 
     Column(
@@ -61,6 +61,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+
         }
         if (state.openDialog) {
 
@@ -76,6 +77,13 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
 
                 var isPlaying by remember { mutableStateOf(false) }
                 val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
+
+                var saved by remember { mutableStateOf(false) }
+
+                LaunchedEffect(state.infoItem.saved) {
+                    saved = state.infoItem.saved
+                }
+
 
                 DisposableEffect(state.infoItem.audio) {
 
@@ -121,6 +129,8 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
 
                     }
                 }
+
+
                 Box(
                     Modifier
                         .sizeIn()
@@ -184,7 +194,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.End)
-                                .clickable { viewModel.onToggleSaveWord(state.infoItem) },
+                                .clickable { viewModel.onEvent(SearchEvent.OnSaveWord(state.infoItem)) },
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -199,7 +209,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                             }
                             Text(
                                 "Save",
-                                color = ifWordIsSaved(state.infoItem.saved)
+                                color = ifWordIsSaved(saved)
                             )
                             Spacer(Modifier.size(24.dp))
                         }

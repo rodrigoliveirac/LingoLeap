@@ -1,13 +1,8 @@
 package com.rodcollab.lingoleap.search
 
 import com.rodcollab.lingoleap.saved.WordsSavedRepository
-import com.rodcollab.lingoleap.saved.WordsSavedRepositoryImpl
 
-class SaveWordImpl : SaveWord {
-
-    private val getSavedWord: WordsSavedRepository by lazy {
-        WordsSavedRepositoryImpl()
-    }
+class SaveWordImpl(private val getSavedWord: WordsSavedRepository) : SaveWord {
 
     override suspend fun invoke(name: String) {
         val wordSaved = getSavedWord.getSavedWords().any { it.name == name }
