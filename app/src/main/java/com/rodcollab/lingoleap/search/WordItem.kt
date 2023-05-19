@@ -48,7 +48,7 @@ fun WordItem(
                 ) {
 
                     Text(
-                        text = item.word,
+                        text = item.name,
                         style = MaterialTheme.typography.body1,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -57,7 +57,7 @@ fun WordItem(
                     Spacer(modifier = modifier.height(8.dp))
 
                     Text(
-                        text = item.meanings?.size.toString(),
+                        text = item.arrayInformation[0].meanings[0].definitions[0].definition.toString(),
                         style = MaterialTheme.typography.body2
                     )
                 }

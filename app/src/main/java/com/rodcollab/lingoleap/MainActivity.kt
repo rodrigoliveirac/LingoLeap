@@ -3,6 +3,7 @@ package com.rodcollab.lingoleap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -18,14 +19,25 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.rodcollab.lingoleap.core.database.AppDatabase
 import com.rodcollab.lingoleap.history.HistoryScreen
 import com.rodcollab.lingoleap.profile.ProfileScreen
+import com.rodcollab.lingoleap.saved.WordsSavedRepositoryImpl
 import com.rodcollab.lingoleap.search.SearchScreen
+import com.rodcollab.lingoleap.search.SearchViewModel
 import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: SearchViewModel by viewModels<SearchViewModel> {
+        val db = AppDatabase.getInstance(this.applicationContext)
+        val repository = WordsSavedRepositoryImpl(db)
+        SearchViewModel.MyViewModelFactory(repository)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycle.addObserver(MyObserver(viewModel))
         setContent {
             LingoLeapTheme {
                 val navController = rememberNavController()
@@ -41,7 +53,8 @@ class MainActivity : ComponentActivity() {
                             SearchScreen(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(paddingValues)
+                                    .padding(paddingValues),
+                                viewModel = viewModel
                             )
                         }
                         composable("history") {

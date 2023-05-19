@@ -28,10 +28,9 @@ import kotlinx.coroutines.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
-    // on below line we are creating a variable for our audio url
+fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
 
-    val state = viewModel.state
+    val state by viewModel.state.collectAsState()
     val keyBoardController = LocalSoftwareKeyboardController.current
 
     Column(
@@ -62,6 +61,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+
         }
         if (state.openDialog) {
 
@@ -77,6 +77,13 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
 
                 var isPlaying by remember { mutableStateOf(false) }
                 val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
+
+                var saved by remember { mutableStateOf(false) }
+
+                LaunchedEffect(state.infoItem.saved) {
+                    saved = state.infoItem.saved
+                }
+
 
                 DisposableEffect(state.infoItem.audio) {
 
@@ -122,6 +129,8 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
 
                     }
                 }
+
+
                 Box(
                     Modifier
                         .sizeIn()
@@ -185,7 +194,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .align(Alignment.End)
-                                .clickable { },
+                                .clickable { viewModel.onEvent(SearchEvent.OnSaveWord(state.infoItem)) },
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -195,12 +204,12 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                                 Icon(
                                     painterResource(id = R.drawable.ic_bookmark),
                                     contentDescription = "Bookmark",
-                                    tint = Color.Gray
+                                    tint = ifWordIsSaved(state.infoItem.saved)
                                 )
                             }
                             Text(
                                 "Save",
-                                color = Color.Gray
+                                color = ifWordIsSaved(saved)
                             )
                             Spacer(Modifier.size(24.dp))
                         }
@@ -208,6 +217,14 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = viewModel()) {
                 }
             }
         }
+    }
+}
+
+fun ifWordIsSaved(value: Boolean): Color {
+    return if (value) {
+        Color.Magenta
+    } else {
+        Color.Gray
     }
 }
 
