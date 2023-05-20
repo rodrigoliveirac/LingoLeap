@@ -46,6 +46,14 @@ class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : 
             is SearchEvent.OnSearch -> {
                 executeSearch()
             }
+            is SearchEvent.OnClearHistory -> {
+                viewModelScope.launch {
+                    listCache.clear()
+                    _state.value.let {
+                        _state.value = it.copy(words = listCache)
+                    }
+                }
+            }
             is SearchEvent.OnWordClick -> {
 
                 _state.value.infoItem.let {

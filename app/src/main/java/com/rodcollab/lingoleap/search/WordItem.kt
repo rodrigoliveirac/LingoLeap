@@ -2,17 +2,19 @@ package com.rodcollab.lingoleap.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun WordItem(
@@ -22,46 +24,46 @@ fun WordItem(
 ) {
     val item = wordItemUiState.element
 
-    Column(
+    Row(
         modifier = modifier
-            .clip(RoundedCornerShape(5.dp))
-            .padding(4.dp)
-            .shadow(
-                elevation = 1.dp,
-                shape = RoundedCornerShape(5.dp)
-            )
+            .fillMaxWidth()
             .background(MaterialTheme.colors.surface)
-            .clickable { onClick() }
-            .padding(end = 16.dp)
+            .clickable { onClick() },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                modifier = Modifier.weight(1f)
-            ) {
+        Text(
+            modifier = modifier.padding(16.dp),
+            text = item.name,
+            style = MaterialTheme.typography.body1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
-                Column(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                ) {
-
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.body1,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Spacer(modifier = modifier.height(8.dp))
-
-                    Text(
-                        text = item.arrayInformation[0].meanings[0].definitions[0].definition.toString(),
-                        style = MaterialTheme.typography.body2
-                    )
-                }
-            }
-        }
     }
+}
+
+@Preview
+@Composable
+fun WordItemPreview() {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.surface)
+            .clickable { },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.padding(16.dp),
+            text = "Word",
+            style = MaterialTheme.typography.body1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 24.sp,
+        )
+
+    }
+
 }

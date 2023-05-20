@@ -50,7 +50,18 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
                 viewModel.onEvent(SearchEvent.OnSearchFocusChange(it.isFocused))
 
             })
-        Spacer(modifier = Modifier.height(16.dp))
+        if(state.words.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier
+                .align(Alignment.End)
+                .clickable { viewModel.onEvent(SearchEvent.OnClearHistory) }) {
+                Text("clear history", fontSize = 14.sp)
+                Spacer(modifier = Modifier.size(8.dp))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        } else {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(state.words) { word ->
                 WordItem(
@@ -250,7 +261,7 @@ fun DialogPreview() {
                 .align(Alignment.Center)
                 .padding(16.dp)
         ) {
-            Text("Hello", fontSize = 24.sp)
+            Text(text = "Hello", fontSize = 24.sp)
             Spacer(Modifier.size(8.dp))
             Text(
                 text = "Definition: Used as a greeting or to begin a phone conversation.",
