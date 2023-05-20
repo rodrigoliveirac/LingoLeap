@@ -7,11 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.rodcollab.lingoleap.saved.WordsSavedRepository
 import com.rodcollab.lingoleap.search.domain.GetWordUseCase
 import com.rodcollab.lingoleap.search.domain.GetWordUseCaseImpl
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : ViewModel() {
+
+    private val listCache = mutableListOf<WordItemUiState>()
 
     private val saveWord: SaveWord by lazy {
         SaveWordImpl(wordsSavedRepository)
@@ -21,7 +25,14 @@ class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : 
         GetWordUseCaseImpl(wordsSavedRepository)
     }
 
-    private val _state by lazy { MutableStateFlow(SearchState(infoItem = InfoItemClicked())) }
+    private val _state by lazy {
+        MutableStateFlow(
+            SearchState(
+                infoItem = InfoItemClicked(),
+                words = listCache
+            )
+        )
+    }
     val state: StateFlow<SearchState> = _state
 
     fun onEvent(event: SearchEvent) {
@@ -102,18 +113,26 @@ class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : 
     private fun executeSearch() {
         viewModelScope.launch {
 
-            _state.value = _state.value.copy(
-                isSearching = true,
-                words = emptyList()
-            )
+            withContext(Dispatchers.Main) {
+                _state.value = _state.value.copy(
+                    isSearching = true,
+                    words = listCache.reversed()
+                )
+            }
 
-            _state.value = _state.value.copy(
-                words = getWord(_state.value.query).map { infoItem ->
-                    WordItemUiState(element = infoItem)
-                },
-                isSearching = false,
-                query = ""
-            )
+            withContext(Dispatchers.IO) {
+                getWord(_state.value.query).map { infoItem ->
+                    listCache.add(WordItemUiState(element = infoItem))
+                }
+            }
+
+            withContext(Dispatchers.Main) {
+                _state.value = _state.value.copy(
+                    words = listCache.reversed(),
+                    isSearching = false,
+                    query = ""
+                )
+            }
         }
     }
 
@@ -141,5 +160,10 @@ class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : 
         ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
             SearchViewModel(wordsSavedRepository) as T
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        listCache.clear()
     }
 }
