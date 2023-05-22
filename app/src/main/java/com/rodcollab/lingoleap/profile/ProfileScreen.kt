@@ -1,5 +1,6 @@
 package com.rodcollab.lingoleap.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
@@ -13,16 +14,48 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.rodcollab.lingoleap.R
+import com.rodcollab.lingoleap.ui.theme.Shapes
 
 @Composable
 fun ProfileScreen(navController: NavController, modifier: Modifier) {
 
-    Column(modifier = modifier.padding(8.dp).fillMaxSize()) {
+    Column() {
         Row(
-            modifier = Modifier.fillMaxWidth().clickable { navController.navigate("saved_screen") },
+            modifier = modifier
+                .fillMaxWidth()
+                .clickable {  },
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
+            IconButton(
+                onClick = {  }
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.ic_person),
+                    contentDescription = "Person",
+                    tint = Color.Gray
+                )
+            }
+            Text(
+                "Data Account",
+                color = Color.Gray
+            )
+        }
+        Spacer(modifier = Modifier
+            .height(4.dp)
+            .background(
+                Color.Gray, Shapes.large
+            ))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { navController.navigate("saved_screen") }
+            ,
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
             IconButton(
                 onClick = { }
             ) {
