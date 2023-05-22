@@ -87,26 +87,18 @@ fun SavedWordItem(
     var isPlaying by remember { mutableStateOf(false) }
     val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
 
-    DisposableEffect(wordItemUiState.audio) {
+    LaunchedEffect(wordItemUiState.audio) {
 
         mediaPlayer.apply {
             setDataSource(wordItemUiState.audio)
             setAudioAttributes(audioAttributes)
             prepare()
         }
-
-        onDispose {
-            mediaPlayer.release()
-
-        }
     }
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
 
         isPlaying = mediaPlayer.isPlaying
 
-        onDispose {
-            isPlaying = false
-        }
     }
 
     if (isPlaying) {

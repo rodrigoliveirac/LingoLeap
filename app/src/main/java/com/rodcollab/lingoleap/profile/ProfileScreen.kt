@@ -19,9 +19,9 @@ import com.rodcollab.lingoleap.ui.theme.Shapes
 @Composable
 fun ProfileScreen(navController: NavController, modifier: Modifier) {
 
-    Column() {
+    Column(modifier = modifier.sizeIn()) {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .clickable {  },
             horizontalArrangement = Arrangement.Start,
