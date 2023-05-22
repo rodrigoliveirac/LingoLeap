@@ -21,11 +21,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.rodcollab.lingoleap.core.database.AppDatabase
 import com.rodcollab.lingoleap.history.HistoryScreen
+import com.rodcollab.lingoleap.history.HistoryViewModel
 import com.rodcollab.lingoleap.profile.ProfileScreen
 import com.rodcollab.lingoleap.profile.SavedScreen
 import com.rodcollab.lingoleap.profile.SavedViewModel
 import com.rodcollab.lingoleap.profile.WordsSavedUseCaseImpl
 import com.rodcollab.lingoleap.saved.WordsSavedRepositoryImpl
+import com.rodcollab.lingoleap.search.SearchHistoryImpl
 import com.rodcollab.lingoleap.search.SearchScreen
 import com.rodcollab.lingoleap.search.SearchViewModel
 import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
@@ -35,22 +37,30 @@ class MainActivity : ComponentActivity() {
     private val db: AppDatabase by lazy {
         AppDatabase.getInstance(this.applicationContext)
     }
-    private val repository : WordsSavedRepositoryImpl by lazy {
+    private val repository: WordsSavedRepositoryImpl by lazy {
         WordsSavedRepositoryImpl(db)
     }
 
-    private val viewModel: SearchViewModel by viewModels {
-        SearchViewModel.MyViewModelFactory(repository)
+    private val searchRepository: SearchHistoryImpl by lazy {
+        SearchHistoryImpl(db)
     }
 
-    private val savedViewModel : SavedViewModel by viewModels {
+    private val viewModel: SearchViewModel by viewModels {
+        SearchViewModel.MyViewModelFactory(searchRepository, repository)
+    }
+
+    private val savedViewModel: SavedViewModel by viewModels {
         val useCase = WordsSavedUseCaseImpl(repository)
         SavedViewModel.SavedViewModelFactory(useCase)
     }
 
+    private val searchHistoryViewModel: HistoryViewModel by viewModels {
+        HistoryViewModel.HistoryViewModelFactory(searchRepository)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycle.addObserver(MyObserver(savedViewModel,viewModel))
+        lifecycle.addObserver(MyObserver(searchHistoryViewModel, savedViewModel, viewModel))
         setContent {
             LingoLeapTheme {
                 val navController = rememberNavController()
@@ -74,7 +84,8 @@ class MainActivity : ComponentActivity() {
                             HistoryScreen(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(paddingValues)
+                                    .padding(paddingValues),
+                                searchHistoryViewModel
                             )
                         }
                         composable("profile") {
@@ -89,8 +100,9 @@ class MainActivity : ComponentActivity() {
                             SavedScreen(
                                 navController = navController,
                                 modifier = Modifier
-                                .fillMaxSize()
-                                .padding(paddingValues), savedViewModel)
+                                    .fillMaxSize()
+                                    .padding(paddingValues), savedViewModel
+                            )
                         }
                     }
                 }
