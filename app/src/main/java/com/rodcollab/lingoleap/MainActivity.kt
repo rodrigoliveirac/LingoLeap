@@ -87,6 +87,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("saved_screen") {
                             SavedScreen(
+                                navController = navController,
                                 modifier = Modifier
                                 .fillMaxSize()
                                 .padding(paddingValues), savedViewModel)
