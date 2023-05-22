@@ -22,6 +22,9 @@ import androidx.navigation.compose.rememberNavController
 import com.rodcollab.lingoleap.core.database.AppDatabase
 import com.rodcollab.lingoleap.history.HistoryScreen
 import com.rodcollab.lingoleap.profile.ProfileScreen
+import com.rodcollab.lingoleap.profile.SavedScreen
+import com.rodcollab.lingoleap.profile.SavedViewModel
+import com.rodcollab.lingoleap.profile.WordsSavedUseCaseImpl
 import com.rodcollab.lingoleap.saved.WordsSavedRepositoryImpl
 import com.rodcollab.lingoleap.search.SearchScreen
 import com.rodcollab.lingoleap.search.SearchViewModel
@@ -29,15 +32,25 @@ import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 
 class MainActivity : ComponentActivity() {
 
+    private val db: AppDatabase by lazy {
+        AppDatabase.getInstance(this.applicationContext)
+    }
+    private val repository : WordsSavedRepositoryImpl by lazy {
+        WordsSavedRepositoryImpl(db)
+    }
+
     private val viewModel: SearchViewModel by viewModels {
-        val db = AppDatabase.getInstance(this.applicationContext)
-        val repository = WordsSavedRepositoryImpl(db)
         SearchViewModel.MyViewModelFactory(repository)
+    }
+
+    private val savedViewModel : SavedViewModel by viewModels {
+        val useCase = WordsSavedUseCaseImpl(repository)
+        SavedViewModel.SavedViewModelFactory(useCase)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycle.addObserver(MyObserver(viewModel))
+        lifecycle.addObserver(MyObserver(savedViewModel,viewModel))
         setContent {
             LingoLeapTheme {
                 val navController = rememberNavController()
@@ -66,10 +79,17 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("profile") {
                             ProfileScreen(
+                                navController = navController,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(paddingValues)
                             )
+                        }
+                        composable("saved_screen") {
+                            SavedScreen(
+                                modifier = Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues), savedViewModel)
                         }
                     }
                 }
