@@ -5,11 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.rodcollab.lingoleap.core.database.dao.SavedWordDao
+import com.rodcollab.lingoleap.search.SearchedWord
 
-@Database(entities = [SavedWord::class], version = 1, exportSchema = false)
+@Database(entities = [SavedWord::class, SearchedWord::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun savedWordDao(): SavedWordDao
+    abstract fun searchHistoryDao() : SearchHistoryDao
 
     companion object {
         private var instance: AppDatabase? = null
@@ -21,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                         context.applicationContext,
                         AppDatabase::class.java,
                         DATABASE_NAME
-                    ).build()
+                    ).fallbackToDestructiveMigration().build()
                 }
             }
             return instance!!
