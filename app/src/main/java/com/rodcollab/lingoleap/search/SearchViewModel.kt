@@ -13,7 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : ViewModel() {
+class SearchViewModel(
+    private val searchHistory: SearchHistory,
+    private val wordsSavedRepository: WordsSavedRepository
+) : ViewModel() {
 
     private val listCache = mutableListOf<WordItemUiState>()
 
@@ -131,6 +134,7 @@ class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : 
             withContext(Dispatchers.IO) {
                 getWord(_state.value.query).map { infoItem ->
                     listCache.add(WordItemUiState(element = infoItem))
+                    searchHistory.add(infoItem)
                 }
             }
 
@@ -164,10 +168,13 @@ class SearchViewModel(private val wordsSavedRepository: WordsSavedRepository) : 
         }
     }
 
-    class MyViewModelFactory(private val wordsSavedRepository: WordsSavedRepository) :
+    class MyViewModelFactory(
+        private val searchHistory: SearchHistory,
+        private val wordsSavedRepository: WordsSavedRepository
+    ) :
         ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            SearchViewModel(wordsSavedRepository) as T
+            SearchViewModel(searchHistory, wordsSavedRepository) as T
     }
 
     override fun onCleared() {
