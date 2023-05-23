@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,6 +20,11 @@ import androidx.compose.ui.unit.dp
 fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel) {
 
     val state by viewModel.state.collectAsState()
+
+    DisposableEffect(viewModel) {
+        viewModel.onResume()
+        onDispose {  }
+    }
 
     Column(modifier = modifier) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {

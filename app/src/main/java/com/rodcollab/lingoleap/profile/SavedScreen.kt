@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +26,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun SavedScreen(navController: NavController, modifier: Modifier, viewModel: SavedViewModel) {
 
-    val state by viewModel.state.observeAsState()
+    val state by viewModel.wordList.collectAsState()
+
+    DisposableEffect(viewModel) {
+        viewModel.showList()
+        onDispose {  }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxWidth(),
@@ -60,11 +64,12 @@ fun SavedScreen(navController: NavController, modifier: Modifier, viewModel: Sav
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(paddingValues)
         ) {
-            state?.let { uiState ->
-                items(uiState.list) { savedWord ->
+            state?.let {
+                items(it.list) { savedWord ->
                     SavedWordItem(wordItemUiState = savedWord, onClick = { TODO() })
                 }
             }
+
         }
     }
 }
@@ -87,14 +92,7 @@ fun SavedWordItem(
     var isPlaying by remember { mutableStateOf(false) }
     val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
 
-    LaunchedEffect(wordItemUiState.audio) {
 
-        mediaPlayer.apply {
-            setDataSource(wordItemUiState.audio)
-            setAudioAttributes(audioAttributes)
-            prepare()
-        }
-    }
     LaunchedEffect(Unit) {
 
         isPlaying = mediaPlayer.isPlaying
@@ -146,6 +144,11 @@ fun SavedWordItem(
             ) {
                 IconButton(
                     onClick = {
+                        mediaPlayer.apply {
+                            setDataSource(wordItemUiState.audio)
+                            setAudioAttributes(audioAttributes)
+                            prepare()
+                        }
                         isPlaying = if (isPlaying) {
                             mediaPlayer.pause()
                             false

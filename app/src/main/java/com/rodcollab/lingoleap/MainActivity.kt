@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycle.addObserver(MyObserver(searchHistoryViewModel, savedViewModel, viewModel))
+
         setContent {
             LingoLeapTheme {
                 val navController = rememberNavController()

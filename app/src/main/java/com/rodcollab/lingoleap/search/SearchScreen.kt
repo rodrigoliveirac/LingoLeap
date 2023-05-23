@@ -33,6 +33,11 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
     val state by viewModel.state.collectAsState()
     val keyBoardController = LocalSoftwareKeyboardController.current
 
+    DisposableEffect(viewModel) {
+        viewModel.onResume()
+        onDispose {  }
+    }
+
     Column(
         modifier
             .fillMaxSize()
