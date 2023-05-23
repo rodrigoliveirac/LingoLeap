@@ -26,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.*
 import com.rodcollab.lingoleap.R
 import kotlinx.coroutines.*
 
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
@@ -33,9 +34,13 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
     val state by viewModel.state.collectAsState()
     val keyBoardController = LocalSoftwareKeyboardController.current
 
-    DisposableEffect(viewModel) {
+    DisposableEffect(state) {
         viewModel.onResume()
         onDispose {  }
+    }
+
+    LaunchedEffect(state) {
+        viewModel.onResume()
     }
 
     Column(
@@ -55,7 +60,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
                 viewModel.onEvent(SearchEvent.OnSearchFocusChange(it.isFocused))
 
             })
-        if(state.words.isNotEmpty()) {
+        if (state.words.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier
                 .align(Alignment.End)
@@ -81,155 +86,168 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
         }
         if (state.openDialog) {
 
-            Dialog(onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
+            DialogComponent(viewModel, state)
+        }
+    }
+}
 
-                val audioAttributes = AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
+@Composable
+private fun DialogComponent(
+    viewModel: SearchViewModel,
+    state: SearchState
+) {
+    Dialog(onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .build()
 
 
-                var progress by remember { mutableStateOf(0f) }
+        var progress by remember { mutableStateOf(0f) }
 
-                var isPlaying by remember { mutableStateOf(false) }
-                val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
+        var isPlaying by remember { mutableStateOf(false) }
+        val mediaPlayer by remember { mutableStateOf(MediaPlayer()) }
 
-                var saved by remember { mutableStateOf(false) }
+        var saved by remember { mutableStateOf(false) }
 
-                LaunchedEffect(state.infoItem.saved) {
-                    saved = state.infoItem.saved
+        LaunchedEffect(state.infoItem.saved) {
+            saved = state.infoItem.saved
+        }
+
+
+        DisposableEffect(state.infoItem.audio) {
+
+
+            mediaPlayer.apply {
+                setDataSource(state.infoItem.audio)
+                setAudioAttributes(audioAttributes)
+                prepare()
+            }
+
+            onDispose {
+                mediaPlayer.release()
+
+            }
+        }
+        DisposableEffect(Unit) {
+
+            isPlaying = mediaPlayer.isPlaying
+
+            onDispose {
+                isPlaying = false
+            }
+        }
+
+        if (isPlaying) {
+            LaunchedEffect(Unit) {
+                while (true) {
+
+                    progress = mediaPlayer.currentPosition.toFloat()
+                    delay(1000 / 30)
+
                 }
+            }
+        }
 
 
-                DisposableEffect(state.infoItem.audio) {
+        LaunchedEffect(mediaPlayer) {
+
+            mediaPlayer.setOnCompletionListener {
+
+                progress = 0f
+                isPlaying = false
+
+            }
+        }
 
 
-                    mediaPlayer.apply {
-                        setDataSource(state.infoItem.audio)
-                        setAudioAttributes(audioAttributes)
-                        prepare()
-                    }
+        Box(
+            Modifier
+                .sizeIn()
+                .background(Color.White, RoundedCornerShape(8.dp))
 
-                    onDispose {
-                        mediaPlayer.release()
-
-                    }
-                }
-                DisposableEffect(Unit) {
-
-                    isPlaying = mediaPlayer.isPlaying
-
-                    onDispose {
-                        isPlaying = false
-                    }
-                }
-
-                if (isPlaying) {
-                    LaunchedEffect(Unit) {
-                        while (true) {
-
-                            progress = mediaPlayer.currentPosition.toFloat()
-                            delay(1000 / 30)
-
-                        }
-                    }
-                }
-
-
-                LaunchedEffect(mediaPlayer) {
-
-                    mediaPlayer.setOnCompletionListener {
-
-                        progress = 0f
-                        isPlaying = false
-
-                    }
-                }
-
-
-                Box(
-                    Modifier
-                        .sizeIn()
-                        .background(Color.White, RoundedCornerShape(8.dp))
-
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = state.infoItem.word.replaceFirstChar { it.uppercase() },
+                    fontSize = 24.sp
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "Definition: ${state.infoItem.meaning}", fontSize = 16.sp,
+                    color = Color.Gray,
+                    fontStyle = FontStyle.Italic
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                        .align(Alignment.Start)
                 ) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.Center)
-                            .padding(16.dp)
+                    IconButton(
+                        onClick = {
+                            Log.d("isPlaying", isPlaying.toString())
+
+                            isPlaying = if (isPlaying) {
+                                mediaPlayer.pause()
+                                false
+                            } else {
+                                mediaPlayer.start()
+                                true
+                            }
+
+                        }
                     ) {
-                        Text(text = state.infoItem.word.replaceFirstChar { it.uppercase() }, fontSize = 24.sp)
-                        Spacer(modifier = Modifier.size(8.dp))
-                        Text(
-                            text = "Definition: ${state.infoItem.meaning}", fontSize = 16.sp,
-                            color = Color.Gray,
-                            fontStyle = FontStyle.Italic
+                        Icon(
+                            painter = painterResource(id = setIcon(isPlaying)),
+                            contentDescription = "Play",
+                            tint = MaterialTheme.colors.primary
                         )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp)
-                                .align(Alignment.Start)
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    Log.d("isPlaying", isPlaying.toString())
-
-                                    isPlaying = if (isPlaying) {
-                                        mediaPlayer.pause()
-                                        false
-                                    } else {
-                                        mediaPlayer.start()
-                                        true
-                                    }
-
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = setIcon(isPlaying)),
-                                    contentDescription = "Play",
-                                    tint = MaterialTheme.colors.primary
-                                )
-                            }
-
-                            Slider(
-                                value = progress,
-                                onValueChange = { progress = it },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                colors = SliderDefaults.colors(
-                                    thumbColor = MaterialTheme.colors.primary
-                                ),
-                                valueRange = 0f..mediaPlayer.duration.toFloat()
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.End)
-                                .clickable { viewModel.onEvent(SearchEvent.OnSaveWord(state.infoItem)) },
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            IconButton(
-                                onClick = {}
-                            ) {
-                                Icon(
-                                    painterResource(id = R.drawable.ic_bookmark),
-                                    contentDescription = "Bookmark",
-                                    tint = ifWordIsSaved(state.infoItem.saved)
-                                )
-                            }
-                            Text(
-                                "Save",
-                                color = ifWordIsSaved(saved)
-                            )
-                            Spacer(Modifier.size(24.dp))
-                        }
                     }
+
+                    Slider(
+                        value = progress,
+                        onValueChange = { progress = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        colors = SliderDefaults.colors(
+                            thumbColor = MaterialTheme.colors.primary
+                        ),
+                        valueRange = 0f..mediaPlayer.duration.toFloat()
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.End)
+                        .clickable {
+                            viewModel.onEvent(SearchEvent.OnSaveWord(state.infoItem))
+                        },
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {}
+                    ) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_bookmark),
+                            contentDescription = "Bookmark",
+                            tint = ifWordIsSaved(state.infoItem.saved)
+                        )
+                    }
+                    Text(
+                        "Save",
+                        color = ifWordIsSaved(saved)
+                    )
+                    Spacer(Modifier.size(24.dp))
                 }
             }
         }

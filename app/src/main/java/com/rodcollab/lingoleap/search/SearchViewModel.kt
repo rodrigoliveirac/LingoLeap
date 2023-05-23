@@ -18,7 +18,9 @@ class SearchViewModel(
     private val wordsSavedRepository: WordsSavedRepository
 ) : ViewModel() {
 
-    private val listCache = mutableListOf<WordItemUiState>()
+    private var listCache = mutableListOf<WordItemUiState>()
+
+    private var listCacheFlow = MutableStateFlow(listCache.map { it.copy() })
 
     private val saveWord: SaveWord by lazy {
         SaveWordImpl(wordsSavedRepository)
@@ -32,7 +34,7 @@ class SearchViewModel(
         MutableStateFlow(
             SearchState(
                 infoItem = InfoItemClicked(),
-                words = listCache
+                words = listCacheFlow.value
             )
         )
     }
@@ -102,6 +104,10 @@ class SearchViewModel(
                     Log.d("savedWords", wordsSavedRepository.getSavedWords().toString())
 
                     _state.value.infoItem.let { itemClicked ->
+                        val saved = withContext(Dispatchers.IO) {
+                            wordsSavedRepository.getSavedWords()
+                                .any { itemClicked.word == it.name }
+                        }
                         _state.value = SearchState(
                             query = _state.value.query,
                             isHintVisible = _state.value.isHintVisible,
@@ -112,10 +118,10 @@ class SearchViewModel(
                                 word = itemClicked.word,
                                 meaning = itemClicked.meaning,
                                 audio = itemClicked.audio,
-                                saved = wordsSavedRepository.getSavedWords()
-                                    .any { itemClicked.word == it.name })
+                                saved = saved)
                         )
                     }
+
                 }
             }
         }
@@ -127,20 +133,21 @@ class SearchViewModel(
             withContext(Dispatchers.Main) {
                 _state.value = _state.value.copy(
                     isSearching = true,
-                    words = listCache.reversed()
+                    words = listCacheFlow.value.reversed()
                 )
             }
 
             withContext(Dispatchers.IO) {
                 getWord(_state.value.query).map { infoItem ->
                     listCache.add(WordItemUiState(element = infoItem))
+                    listCacheFlow.value = listCache
                     searchHistory.add(infoItem)
                 }
             }
 
             withContext(Dispatchers.Main) {
                 _state.value = _state.value.copy(
-                    words = listCache.reversed(),
+                    words = listCacheFlow.value.reversed(),
                     isSearching = false,
                     query = ""
                 )
