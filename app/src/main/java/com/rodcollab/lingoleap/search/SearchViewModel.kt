@@ -64,12 +64,10 @@ class SearchViewModel(
                 _state.value.infoItem.let {
                     _state.value.infoItem = it.copy(
                         word = event.word.name,
-                        meaning = event.word.arrayInformation[0].meanings[0].definitions[0].definition
-                            ?: "no definitions for this word :(",
+                        meanings = event.word.arrayInformation[0].meanings,
                         saved = event.word.saved
                     )
                 }
-
 
                 event.word.arrayInformation[0].phonetics.onEach {
                     if (it.audio?.isNotBlank() == true) {
@@ -116,9 +114,10 @@ class SearchViewModel(
                             openDialog = _state.value.openDialog,
                             infoItem = InfoItemClicked(
                                 word = itemClicked.word,
-                                meaning = itemClicked.meaning,
+                                meanings = itemClicked.meanings,
                                 audio = itemClicked.audio,
-                                saved = saved)
+                                saved = saved
+                            )
                         )
                     }
 
@@ -166,7 +165,7 @@ class SearchViewModel(
                     openDialog = _state.value.openDialog,
                     infoItem = InfoItemClicked(
                         word = itemClicked.word,
-                        meaning = itemClicked.meaning,
+                        meanings = itemClicked.meanings,
                         audio = itemClicked.audio,
                         saved = wordsSavedRepository.getSavedWords()
                             .any { itemClicked.word == it.name })

@@ -1,5 +1,7 @@
 package com.rodcollab.lingoleap.search
 
+import com.rodcollab.lingoleap.api.model.Meaning
+
 data class SearchState(
     val query: String = "",
     val isHintVisible: Boolean = false,
@@ -11,7 +13,7 @@ data class SearchState(
 
 data class InfoItemClicked(
     val word: String = "",
-    val meaning: String = "",
+    val meanings: List<Meaning> = listOf(),
     val audio: String = "",
     val saved: Boolean = false
 )

@@ -5,9 +5,11 @@ import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -36,7 +38,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
 
     DisposableEffect(state) {
         viewModel.onResume()
-        onDispose {  }
+        onDispose { }
     }
 
     LaunchedEffect(state) {
@@ -112,8 +114,17 @@ private fun DialogComponent(
 
         var saved by remember { mutableStateOf(false) }
 
+        var meaningIndex by remember { mutableStateOf(0) }
+
+        var definition by remember { mutableStateOf("") }
+
         LaunchedEffect(state.infoItem.saved) {
             saved = state.infoItem.saved
+        }
+
+        LaunchedEffect(meaningIndex) {
+
+            definition = state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()
         }
 
 
@@ -181,18 +192,18 @@ private fun DialogComponent(
                 )
                 Spacer(Modifier.size(8.dp))
                 Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    for(i in meanings) {
+                    state.infoItem.meanings.forEachIndexed { index, meaning ->
                         Chip(
                             modifier = Modifier.sizeIn(),
-                            onClick = { /* do something*/ }) {
-                            Text(text = i)
+                            onClick = { meaningIndex = index }) {
+                            Text(meaning.partOfSpeech.toString())
                         }
                         Spacer(modifier = Modifier.size(8.dp))
                     }
                 }
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
-                    text = "Definition: ${state.infoItem.meaning}", fontSize = 16.sp,
+                    text = "Definition: $definition", fontSize = 16.sp,
                     color = Color.Gray,
                     fontStyle = FontStyle.Italic
                 )
@@ -300,7 +311,7 @@ fun DialogPreview() {
             Text(text = "Hello", fontSize = 24.sp)
             Spacer(Modifier.size(8.dp))
             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                for(i in list) {
+                for (i in listOf("one", "two")) {
                     Chip(
                         modifier = Modifier.sizeIn(),
                         onClick = { /* do something*/ }) {
