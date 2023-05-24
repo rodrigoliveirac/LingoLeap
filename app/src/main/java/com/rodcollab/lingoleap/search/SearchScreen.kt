@@ -91,6 +91,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun DialogComponent(
     viewModel: SearchViewModel,
@@ -178,6 +179,17 @@ private fun DialogComponent(
                     text = state.infoItem.word.replaceFirstChar { it.uppercase() },
                     fontSize = 24.sp
                 )
+                Spacer(Modifier.size(8.dp))
+                Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                    for(i in meanings) {
+                        Chip(
+                            modifier = Modifier.sizeIn(),
+                            onClick = { /* do something*/ }) {
+                            Text(text = i)
+                        }
+                        Spacer(modifier = Modifier.size(8.dp))
+                    }
+                }
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
                     text = "Definition: ${state.infoItem.meaning}", fontSize = 16.sp,
@@ -270,6 +282,7 @@ fun setIcon(isPlaying: Boolean): Int {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun DialogPreview() {
@@ -286,6 +299,17 @@ fun DialogPreview() {
         ) {
             Text(text = "Hello", fontSize = 24.sp)
             Spacer(Modifier.size(8.dp))
+            Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                for(i in list) {
+                    Chip(
+                        modifier = Modifier.sizeIn(),
+                        onClick = { /* do something*/ }) {
+                        Text(i)
+                    }
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
+            }
+            Spacer(modifier = Modifier.size(8.dp))
             Text(
                 text = "Definition: Used as a greeting or to begin a phone conversation.",
                 fontSize = 16.sp,
