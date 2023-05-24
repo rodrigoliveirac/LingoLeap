@@ -7,14 +7,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel) {
@@ -23,7 +25,7 @@ fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel) {
 
     DisposableEffect(viewModel) {
         viewModel.onResume()
-        onDispose {  }
+        onDispose { }
     }
 
     Column(modifier = modifier) {
@@ -35,10 +37,8 @@ fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-
         }
     }
-
 }
 
 @Composable
@@ -47,6 +47,7 @@ fun SearchWordItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
 
     Row(
         modifier = modifier
@@ -57,12 +58,60 @@ fun SearchWordItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).weight(1f),
             text = wordItemUiState.name,
             style = MaterialTheme.typography.body1,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
 
+        Text(
+            text = wordItemUiState.date,
+            textAlign = TextAlign.End,
+            fontSize = 12.sp,
+            fontStyle = FontStyle.Italic,
+            color = Color.Gray,
+            style = MaterialTheme.typography.body1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.size(8.dp))
     }
+}
+
+
+@Preview
+@Composable
+fun SearchWordItemPreview(modifier: Modifier = Modifier) {
+
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = modifier,
+            text = "Word",
+            style = MaterialTheme.typography.body1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Text(
+            text = "24/05/2023",
+            textAlign = TextAlign.End,
+            fontSize = 12.sp,
+            fontStyle = FontStyle.Italic,
+            color = Color.Gray,
+            style = MaterialTheme.typography.body1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+    }
+
+
 }

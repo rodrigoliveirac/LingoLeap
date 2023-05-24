@@ -11,7 +11,7 @@ interface SearchHistoryDao {
     @Insert
     suspend fun addSearchedWord(word: SearchedWord)
 
-    @Query("SELECT * FROM search_history")
+    @Query("SELECT * FROM search_history ORDER BY createdAt DESC")
     suspend fun fetchSearchHistory(): List<SearchedWord>
 
 }

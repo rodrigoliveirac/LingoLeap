@@ -4,5 +4,5 @@ interface SearchHistory {
 
     suspend fun add(word: Word)
 
-    suspend fun getList(): List<SearchedWord>
+    suspend fun getList(): List<SearchedWordDomain>
 }

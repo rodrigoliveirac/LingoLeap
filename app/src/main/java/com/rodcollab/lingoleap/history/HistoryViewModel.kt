@@ -19,7 +19,7 @@ class HistoryViewModel(private val searchHistory: SearchHistory) : ViewModel() {
 
     fun onResume() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(list = searchHistory.getList().map { SearchedWordItemState(it.name,it.meaning, it.audio, it.saved) })
+            _state.value = _state.value.copy(list = searchHistory.getList().map { SearchedWordItemState(it.name,it.meaning, it.audio, it.saved, it.createdAt) })
         }
     }
     data class UiState(val list: List<SearchedWordItemState>)
@@ -37,5 +37,6 @@ data class SearchedWordItemState(
     val name: String,
     val meaning: String,
     val audio: String,
-    val saved: Boolean
+    val saved: Boolean,
+    val date: String
 )

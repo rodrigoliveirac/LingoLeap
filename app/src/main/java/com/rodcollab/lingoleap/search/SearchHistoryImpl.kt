@@ -3,7 +3,7 @@ package com.rodcollab.lingoleap.search
 import com.rodcollab.lingoleap.core.database.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.UUID
+import java.util.*
 
 class SearchHistoryImpl(app: AppDatabase) : SearchHistory {
 
@@ -34,5 +34,28 @@ class SearchHistoryImpl(app: AppDatabase) : SearchHistory {
         dao.addSearchedWord(searchWord)
     }
 
-    override suspend fun getList(): List<SearchedWord> = dao.fetchSearchHistory()
+    override suspend fun getList(): List<SearchedWordDomain> {
+        return dao.fetchSearchHistory().map {
+            val date = withContext(Dispatchers.IO) {
+                getDate(it)
+            }
+            SearchedWordDomain(
+                uui = it.uui,
+                name = it.name,
+                createdAt = date,
+                meaning = it.meaning,
+                saved = it.saved,
+                audio = it.audio
+            )
+        }
+    }
+
+    private fun getDate(it: SearchedWord): String {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = it.createdAt
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        return "$day/$month/$year"
+    }
 }
