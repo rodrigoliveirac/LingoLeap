@@ -280,6 +280,7 @@ private fun DialogComponent(
                     )
                     Spacer(Modifier.size(24.dp))
                 }
+                Spacer(Modifier.size(24.dp))
             }
         }
     }
