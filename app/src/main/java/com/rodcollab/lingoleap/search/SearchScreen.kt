@@ -117,6 +117,7 @@ private fun DialogComponent(
         var meaningIndex by remember { mutableStateOf(0) }
 
         var definition by remember { mutableStateOf("") }
+        var example by remember { mutableStateOf("") }
 
         LaunchedEffect(state.infoItem.saved) {
             saved = state.infoItem.saved
@@ -125,6 +126,7 @@ private fun DialogComponent(
         LaunchedEffect(meaningIndex) {
 
             definition = state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()
+            example = state.infoItem.meanings[meaningIndex].definitions[0].example.toString()
         }
 
 
@@ -182,7 +184,7 @@ private fun DialogComponent(
         ) {
             Column(
                 Modifier
-                    .fillMaxWidth()
+                    .sizeIn()
                     .align(Alignment.Center)
                     .padding(16.dp)
             ) {
@@ -204,6 +206,12 @@ private fun DialogComponent(
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
                     text = "Definition: $definition", fontSize = 16.sp,
+                    color = Color.Gray,
+                    fontStyle = FontStyle.Italic
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "Example: $example", fontSize = 16.sp,
                     color = Color.Gray,
                     fontStyle = FontStyle.Italic
                 )
