@@ -126,7 +126,9 @@ private fun DialogComponent(
         LaunchedEffect(meaningIndex) {
 
             definition = state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()
-            example = state.infoItem.meanings[meaningIndex].definitions[0].example.toString()
+            if (state.infoItem.meanings[meaningIndex].definitions[0].example != null) {
+                example = state.infoItem.meanings[meaningIndex].definitions[0].example.toString()
+            }
         }
 
 
@@ -178,14 +180,13 @@ private fun DialogComponent(
 
         Box(
             Modifier
-                .sizeIn()
+                .fillMaxSize(1f)
+                .wrapContentSize()
                 .background(Color.White, RoundedCornerShape(8.dp))
-
         ) {
             Column(
                 Modifier
                     .sizeIn()
-                    .align(Alignment.Center)
                     .padding(16.dp)
             ) {
                 Text(
@@ -210,11 +211,14 @@ private fun DialogComponent(
                     fontStyle = FontStyle.Italic
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = "Example: $example", fontSize = 16.sp,
-                    color = Color.Gray,
-                    fontStyle = FontStyle.Italic
-                )
+                if (example.isNotBlank()) {
+                    Text(
+                        text = "Example: $example", fontSize = 16.sp,
+                        color = Color.Gray,
+                        fontStyle = FontStyle.Italic
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -280,7 +284,6 @@ private fun DialogComponent(
                     )
                     Spacer(Modifier.size(24.dp))
                 }
-                Spacer(Modifier.size(24.dp))
             }
         }
     }
