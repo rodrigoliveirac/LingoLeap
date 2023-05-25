@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.*
 import com.rodcollab.lingoleap.R
 import kotlinx.coroutines.*
@@ -99,7 +100,7 @@ private fun DialogComponent(
     viewModel: SearchViewModel,
     state: SearchState
 ) {
-    Dialog(onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
+    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false), onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
 
         val audioAttributes = AudioAttributes.Builder()
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -116,8 +117,8 @@ private fun DialogComponent(
 
         var meaningIndex by remember { mutableStateOf(0) }
 
-        var definition by remember { mutableStateOf("") }
-        var example by remember { mutableStateOf("") }
+        var definition by remember { mutableStateOf(state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()) }
+        var example by remember { mutableStateOf( state.infoItem.meanings[meaningIndex].definitions[0].example.toString()) }
 
         LaunchedEffect(state.infoItem.saved) {
             saved = state.infoItem.saved
@@ -125,9 +126,11 @@ private fun DialogComponent(
 
         LaunchedEffect(meaningIndex) {
 
-            definition = state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()
-            if (state.infoItem.meanings[meaningIndex].definitions[0].example != null) {
-                example = state.infoItem.meanings[meaningIndex].definitions[0].example.toString()
+           definition = state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()
+            example = if (state.infoItem.meanings[meaningIndex].definitions[0].example != null) {
+                state.infoItem.meanings[meaningIndex].definitions[0].example.toString()
+            } else {
+                ""
             }
         }
 
@@ -180,19 +183,47 @@ private fun DialogComponent(
 
         Box(
             Modifier
-                .fillMaxSize(1f)
-                .wrapContentSize()
+                .width(320.dp)
                 .background(Color.White, RoundedCornerShape(8.dp))
         ) {
             Column(
                 Modifier
                     .sizeIn()
-                    .padding(16.dp)
+                    .padding(18.dp)
             ) {
-                Text(
-                    text = state.infoItem.word.replaceFirstChar { it.uppercase() },
-                    fontSize = 24.sp
-                )
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = state.infoItem.word.replaceFirstChar { it.uppercase() },
+                        fontSize = 24.sp
+                    )
+                    Row(
+                        modifier = Modifier
+                            .sizeIn()
+                            .clickable {
+                                viewModel.onEvent(SearchEvent.OnSaveWord(state.infoItem))
+                            },
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = {}
+                        ) {
+                            Icon(
+                                painterResource(id = R.drawable.ic_bookmark),
+                                contentDescription = "Bookmark",
+                                tint = ifWordIsSaved(state.infoItem.saved)
+                            )
+                        }
+                        Text(
+                            "Save",
+                            color = ifWordIsSaved(saved)
+                        )
+                        Spacer(Modifier.size(24.dp))
+                    }
+                }
+
                 Spacer(Modifier.size(8.dp))
                 Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                     state.infoItem.meanings.forEachIndexed { index, meaning ->
@@ -219,11 +250,13 @@ private fun DialogComponent(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                 }
+                Spacer(modifier = Modifier.size(8.dp))
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .sizeIn()
                         .padding(top = 8.dp)
-                        .align(Alignment.Start)
+                        .align(Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.Bottom
                 ) {
                     IconButton(
                         onClick = {
@@ -258,32 +291,7 @@ private fun DialogComponent(
                         valueRange = 0f..mediaPlayer.duration.toFloat()
                     )
                 }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.End)
-                        .clickable {
-                            viewModel.onEvent(SearchEvent.OnSaveWord(state.infoItem))
-                        },
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(
-                            painterResource(id = R.drawable.ic_bookmark),
-                            contentDescription = "Bookmark",
-                            tint = ifWordIsSaved(state.infoItem.saved)
-                        )
-                    }
-                    Text(
-                        "Save",
-                        color = ifWordIsSaved(saved)
-                    )
-                    Spacer(Modifier.size(24.dp))
-                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
