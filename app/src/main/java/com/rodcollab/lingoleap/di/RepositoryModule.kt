@@ -1,9 +1,9 @@
 package com.rodcollab.lingoleap.di
 
-import com.rodcollab.lingoleap.profile.saved.repository.WordsSavedRepository
-import com.rodcollab.lingoleap.profile.saved.repository.WordsSavedRepositoryImpl
-import com.rodcollab.lingoleap.history.repository.SearchHistory
-import com.rodcollab.lingoleap.history.repository.SearchHistoryImpl
+import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepository
+import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepositoryImpl
+import com.rodcollab.lingoleap.collections.history.repository.SearchHistory
+import com.rodcollab.lingoleap.collections.history.repository.SearchHistoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

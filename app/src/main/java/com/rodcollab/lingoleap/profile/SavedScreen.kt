@@ -18,13 +18,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.rodcollab.lingoleap.R
 import com.rodcollab.lingoleap.search.setIcon
 import kotlinx.coroutines.delay
 
 @Composable
-fun SavedScreen(navController: NavController, modifier: Modifier, viewModel: SavedViewModel) {
+fun SavedScreen(navController: NavController, modifier: Modifier, viewModel: SavedViewModel = hiltViewModel()) {
 
     val state by viewModel.wordList.collectAsState()
 

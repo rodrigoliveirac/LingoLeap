@@ -1,13 +1,15 @@
-package com.rodcollab.lingoleap.search
+package com.rodcollab.lingoleap.collections.history.repository
 
-import com.rodcollab.lingoleap.core.database.AppDatabase
+import com.rodcollab.lingoleap.core.database.SearchHistoryDao
+import com.rodcollab.lingoleap.search.SearchedWord
+import com.rodcollab.lingoleap.search.SearchedWordDomain
+import com.rodcollab.lingoleap.search.Word
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
 
-class SearchHistoryImpl(app: AppDatabase) : SearchHistory {
-
-    private val dao = app.searchHistoryDao()
+class SearchHistoryImpl @Inject constructor(private val dao: SearchHistoryDao) : SearchHistory {
 
     override suspend fun add(word: Word) {
         var audio = ""

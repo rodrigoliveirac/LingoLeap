@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.saved
+package com.rodcollab.lingoleap.collections.saved.repository
 
 import com.rodcollab.lingoleap.search.WordSaved
 

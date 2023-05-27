@@ -1,8 +1,9 @@
-package com.rodcollab.lingoleap.search
+package com.rodcollab.lingoleap.collections.search.domain
 
-import com.rodcollab.lingoleap.saved.WordsSavedRepository
+import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepository
+import javax.inject.Inject
 
-class SaveWordImpl(private val getSavedWord: WordsSavedRepository) : SaveWord {
+class SaveWordImpl @Inject constructor(private val getSavedWord: WordsSavedRepository) : SaveWord {
 
     override suspend fun invoke(name: String) {
         val wordSaved = getSavedWord.getSavedWords().any { it.name == name }
