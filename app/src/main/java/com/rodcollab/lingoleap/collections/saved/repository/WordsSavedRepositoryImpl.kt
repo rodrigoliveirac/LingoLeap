@@ -1,13 +1,13 @@
-package com.rodcollab.lingoleap.saved
+package com.rodcollab.lingoleap.collections.saved.repository
 
 import android.util.Log
-import com.rodcollab.lingoleap.core.database.AppDatabase
 import com.rodcollab.lingoleap.core.database.SavedWord
+import com.rodcollab.lingoleap.core.database.dao.SavedWordDao
 import com.rodcollab.lingoleap.search.WordSaved
+import javax.inject.Inject
 
-class WordsSavedRepositoryImpl(appDatabase: AppDatabase) : WordsSavedRepository {
-
-    private val dao = appDatabase.savedWordDao()
+class WordsSavedRepositoryImpl @Inject constructor(private val dao: SavedWordDao) :
+    WordsSavedRepository {
 
     override suspend fun unsavedWord(name: String) {
         dao.unsaved(name)

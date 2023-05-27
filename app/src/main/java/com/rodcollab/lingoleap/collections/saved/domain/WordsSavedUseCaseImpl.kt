@@ -1,17 +1,15 @@
-package com.rodcollab.lingoleap.profile
+package com.rodcollab.lingoleap.collections.saved.domain
 
+import com.rodcollab.lingoleap.api.DictionaryApiService
 import com.rodcollab.lingoleap.api.model.InfoWord
-import com.rodcollab.lingoleap.saved.WordsSavedRepository
-import com.rodcollab.lingoleap.search.DictionaryApi
+import com.rodcollab.lingoleap.profile.SavedWordItemState
+import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class WordsSavedUseCaseImpl(private val wordsSavedRepository: WordsSavedRepository) :
+class WordsSavedUseCaseImpl @Inject constructor(private val service:DictionaryApiService,private val wordsSavedRepository: WordsSavedRepository) :
     WordsSavedUseCase {
-
-    private val service by lazy {
-        DictionaryApi.retrofitService
-    }
 
     override suspend fun invoke(): List<SavedWordItemState> {
         return wordsSavedRepository.getSavedWords().map {

@@ -1,13 +1,16 @@
 package com.rodcollab.lingoleap.profile
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.rodcollab.lingoleap.collections.saved.domain.WordsSavedUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SavedViewModel(
+@HiltViewModel
+class SavedViewModel @Inject constructor(
     private val wordUseCase: WordsSavedUseCase,
 ) : ViewModel() {
 
@@ -21,12 +24,6 @@ class SavedViewModel(
                 SavedWordItemState(it.name, it.meaning, it.audio)
             }.reversed())
         }
-    }
-
-    class SavedViewModelFactory(private val wordUseCase: WordsSavedUseCase) :
-        ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            SavedViewModel(wordUseCase) as T
     }
 }
 

@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.history
+package com.rodcollab.lingoleap
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,9 +17,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel) {
+fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsState()
 
@@ -58,7 +59,9 @@ fun SearchWordItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = Modifier.padding(16.dp).weight(1f),
+            modifier = Modifier
+                .padding(16.dp)
+                .weight(1f),
             text = wordItemUiState.name,
             style = MaterialTheme.typography.body1,
             maxLines = 1,

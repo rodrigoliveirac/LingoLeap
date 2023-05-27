@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.search
+package com.rodcollab.lingoleap.collections.search.domain
 
 interface SaveWord {
 

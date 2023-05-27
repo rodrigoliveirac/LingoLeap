@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.*
 import com.rodcollab.lingoleap.R
 import kotlinx.coroutines.*
@@ -32,7 +34,7 @@ import kotlinx.coroutines.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel) {
+fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsState()
     val keyBoardController = LocalSoftwareKeyboardController.current
@@ -117,8 +119,8 @@ private fun DialogComponent(
 
         var meaningIndex by remember { mutableStateOf(0) }
 
-        var definition by remember { mutableStateOf(state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()) }
-        var example by remember { mutableStateOf( state.infoItem.meanings[meaningIndex].definitions[0].example.toString()) }
+        var definition by remember { mutableStateOf("") }
+        var example by remember { mutableStateOf("") }
 
         LaunchedEffect(state.infoItem.saved) {
             saved = state.infoItem.saved

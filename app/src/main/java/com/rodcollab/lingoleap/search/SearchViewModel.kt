@@ -2,33 +2,30 @@ package com.rodcollab.lingoleap.search
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.rodcollab.lingoleap.saved.WordsSavedRepository
-import com.rodcollab.lingoleap.search.domain.GetWordUseCase
-import com.rodcollab.lingoleap.search.domain.GetWordUseCaseImpl
+import com.rodcollab.lingoleap.collections.history.repository.SearchHistory
+import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepository
+import com.rodcollab.lingoleap.collections.search.domain.GetWordUseCase
+import com.rodcollab.lingoleap.collections.search.domain.SaveWord
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class SearchViewModel(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val searchHistory: SearchHistory,
-    private val wordsSavedRepository: WordsSavedRepository
+    private val wordsSavedRepository: WordsSavedRepository,
+    private val saveWord: SaveWord,
+    private val getWord: GetWordUseCase
 ) : ViewModel() {
 
     private var listCache = mutableListOf<WordItemUiState>()
 
     private var listCacheFlow = MutableStateFlow(listCache.map { it.copy() })
-
-    private val saveWord: SaveWord by lazy {
-        SaveWordImpl(wordsSavedRepository)
-    }
-
-    private val getWord: GetWordUseCase by lazy {
-        GetWordUseCaseImpl(wordsSavedRepository)
-    }
 
     private val _state by lazy {
         MutableStateFlow(
@@ -172,15 +169,6 @@ class SearchViewModel(
                 )
             }
         }
-    }
-
-    class MyViewModelFactory(
-        private val searchHistory: SearchHistory,
-        private val wordsSavedRepository: WordsSavedRepository
-    ) :
-        ViewModelProvider.NewInstanceFactory() {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T =
-            SearchViewModel(searchHistory, wordsSavedRepository) as T
     }
 
     override fun onCleared() {
