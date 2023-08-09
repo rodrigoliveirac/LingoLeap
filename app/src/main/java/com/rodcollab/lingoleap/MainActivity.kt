@@ -10,15 +10,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.rodcollab.lingoleap.profile.ProfileScreen
 import com.rodcollab.lingoleap.profile.SavedScreen
 import com.rodcollab.lingoleap.search.SearchScreen
@@ -44,6 +45,9 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "search") {
                         composable("search") {
                             SearchScreen(
+                                onClickWord = { word ->
+                                    navController.navigate("word_details/$word")
+                                },
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(paddingValues),
@@ -71,6 +75,9 @@ class MainActivity : ComponentActivity() {
                                     .fillMaxSize()
                                     .padding(paddingValues)
                             )
+                        }
+                        composable("word_details/{word}", arguments = listOf(navArgument("word") { type = NavType.StringType})) {
+                            WordDetailScreen(onNavigateBack = { navController.navigateUp() })
                         }
                     }
                 }

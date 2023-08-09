@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -34,7 +33,11 @@ import kotlinx.coroutines.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = hiltViewModel()) {
+fun SearchScreen(
+    onClickWord: (String) -> Unit,
+    modifier: Modifier,
+    viewModel: SearchViewModel = hiltViewModel()
+) {
 
     val state by viewModel.state.collectAsState()
     val keyBoardController = LocalSoftwareKeyboardController.current
@@ -82,7 +85,7 @@ fun SearchScreen(modifier: Modifier, viewModel: SearchViewModel = hiltViewModel(
                 WordItem(
                     wordItemUiState = word,
                     onClick = {
-                        viewModel.onEvent(SearchEvent.OnWordClick(word.element))
+                        onClickWord(word.element.name)
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -102,7 +105,9 @@ private fun DialogComponent(
     viewModel: SearchViewModel,
     state: SearchState
 ) {
-    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false), onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { viewModel.onEvent(SearchEvent.OpenDialog(false)) }) {
 
         val audioAttributes = AudioAttributes.Builder()
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -128,7 +133,7 @@ private fun DialogComponent(
 
         LaunchedEffect(meaningIndex) {
 
-           definition = state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()
+            definition = state.infoItem.meanings[meaningIndex].definitions[0].definition.toString()
             example = if (state.infoItem.meanings[meaningIndex].definitions[0].example != null) {
                 state.infoItem.meanings[meaningIndex].definitions[0].example.toString()
             } else {
@@ -193,8 +198,10 @@ private fun DialogComponent(
                     .sizeIn()
                     .padding(18.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         modifier = Modifier.weight(1f),
                         text = state.infoItem.word.replaceFirstChar { it.uppercase() },
