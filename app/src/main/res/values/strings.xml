@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">LingoLeap</string>
+    <string name="word_details_title">Word Details</string>
 </resources>
