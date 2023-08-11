@@ -75,6 +75,8 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
 
+    implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+
     def version = "2.9.0"
     implementation "com.squareup.retrofit2:retrofit:$version"
     implementation "com.squareup.retrofit2:converter-moshi:$version"

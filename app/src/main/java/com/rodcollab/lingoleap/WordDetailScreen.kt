@@ -1,6 +1,5 @@
 package com.rodcollab.lingoleap
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -11,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -36,33 +36,89 @@ fun WordDetailScreen(
 
     val viewModel by wordDetailsViewModel.word.collectAsState()
 
+    val languages = wordDetailsViewModel.languages
+
     val pagerState = rememberPagerState(pageCount = {
         2
     })
 
-    var actualPage by remember { mutableStateOf(2) }
+    var actualPage by rememberSaveable { mutableStateOf(2) }
 
-    var meaningIndex by remember { mutableStateOf(0) }
+    var meaningIndex by rememberSaveable { mutableStateOf(0) }
 
-    var definition by remember { mutableStateOf("") }
+    var definition by rememberSaveable { mutableStateOf("") }
 
-    var example by remember { mutableStateOf("") }
+    var example by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(meaningIndex) {
+    var translatedText by rememberSaveable { mutableStateOf("") }
 
-        delay(1000)
+    var actualText by rememberSaveable { mutableStateOf(definition) }
+
+    var isLoading by rememberSaveable { mutableStateOf(true) }
+
+    var selectedLanguage by remember { mutableStateOf<(String?) -> Unit>({})}
+
+    var langCode by remember { mutableStateOf("pt")}
+
+    DisposableEffect(Unit) {
+        wordDetailsViewModel.getLanguages()
+        onDispose {  }
+    }
+
+    LaunchedEffect(meaningIndex, pagerState) {
+
+        isLoading = true
+        delay(500)
+
         definition = viewModel.meanings[meaningIndex].definitions[0].definition.toString()
+            .ifEmpty { "Sorry. We don't have a definition for this" }
         example = if (viewModel.meanings[meaningIndex].definitions[0].example != null) {
             viewModel.meanings[meaningIndex].definitions[0].example.toString()
         } else {
-            ""
+            "Sorry. We don't have an example for this word"
+        }
+
+        actualText = if (actualPage == 0) {
+            definition
+        } else {
+            example
+        }
+
+
+        wordDetailsViewModel.translate(langCode,actualText) {
+            translatedText = it
+            isLoading = false
         }
 
     }
 
+    selectedLanguage = { selectedLang ->
+        if(selectedLang != null) {
+            langCode = selectedLang
+            wordDetailsViewModel.translate(langCode,actualText) { newTranslatedText ->
+                translatedText = newTranslatedText
+            }
+        }
+    }
+
+
+
     LaunchedEffect(pagerState) {
+
         snapshotFlow { pagerState.currentPage }.collect { page ->
+
+            isLoading = true
             actualPage = page
+            actualText = if (actualPage == 0) {
+                definition
+            } else {
+                example
+            }
+            wordDetailsViewModel.translate(langCode,actualText) {
+
+                translatedText = it
+                isLoading = false
+            }
         }
     }
     Scaffold(topBar = {
@@ -82,7 +138,7 @@ fun WordDetailScreen(
                 Text(
                     modifier = Modifier.padding(start = 12.dp),
                     fontSize = 32.sp,
-                    text = viewModel.word
+                    text = wordDetailsViewModel.wordId
                 )
 
                 Row(
@@ -113,7 +169,7 @@ fun WordDetailScreen(
                     }
                 }
 
-                IconButton(onClick = { Log.d("iconAudio", "CLicked") }) {
+                IconButton(onClick = { }) {
                     Icon(
                         modifier = Modifier
                             .padding(top = 16.dp),
@@ -172,28 +228,36 @@ fun WordDetailScreen(
                 }
 
                 HorizontalPager(
-                    state = pagerState, modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    when (actualPage) {
-                        0 -> DefinitionsPage(definition)
-                        1 -> SentencesPage(example)
+                    state = pagerState,
+                    beyondBoundsPageCount = 2,
+                ) { page ->
+                    when (page) {
+                        0 -> {
+                            DefinitionsPage(isLoading = isLoading, definition = definition)
+                        }
+                        1 -> SentencesPage(isLoading = isLoading, sentence = example)
                     }
                 }
 
+                Text(
+                    modifier = Modifier
+                        .padding(top = 32.dp)
+                        .align(Alignment.CenterHorizontally), text = "Translate to"
+                )
+                TranslateComponent(selectedLanguage,languages, isLoading, translatedText)
             }
         }
     }
 }
 
 @Composable
-fun SentencesPage(sentence: String) {
-    ItemComponent(text = sentence)
+fun SentencesPage(isLoading: Boolean, sentence: String) {
+    ItemComponent(isLoading = isLoading, text = sentence)
 }
 
 @Composable
-fun DefinitionsPage(definition: String) {
-    ItemComponent(text = definition)
+fun DefinitionsPage(isLoading: Boolean, definition: String) {
+    ItemComponent(isLoading = isLoading, text = definition)
 }
 
 fun Modifier.bottomBorder(strokeWidth: Dp, color: Color) = composed(
