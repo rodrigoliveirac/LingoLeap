@@ -19,7 +19,7 @@ object TranslatorApiModule {
     @Provides
     @Singleton
     fun provideApiKeyInterceptor(): ApiKeyInterceptor {
-        return ApiKeyInterceptor("1cd6ae4891msh4f3856046fcb584p1dcc2fjsna733a41907bd")
+        return ApiKeyInterceptor()
     }
 
     @Provides
