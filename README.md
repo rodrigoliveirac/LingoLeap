@@ -29,3 +29,4 @@ This Project is created with:
 * *Retrofit*
 * *Firebase*
 * *MediaPlayer*
+* *MVVM Architecture*
