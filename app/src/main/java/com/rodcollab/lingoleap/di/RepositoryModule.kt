@@ -1,5 +1,7 @@
 package com.rodcollab.lingoleap.di
 
+import com.rodcollab.lingoleap.TranslationRepository
+import com.rodcollab.lingoleap.TranslationRepositoryImpl
 import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepository
 import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepositoryImpl
 import com.rodcollab.lingoleap.collections.history.repository.SearchHistory
@@ -21,5 +23,9 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun providesSearchHistoryImpl(impl: SearchHistoryImpl) : SearchHistory
+
+    @Singleton
+    @Binds
+    abstract fun providesTranslationImpl(impl: TranslationRepositoryImpl) : TranslationRepository
 
 }

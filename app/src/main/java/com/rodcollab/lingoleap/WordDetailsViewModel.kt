@@ -1,12 +1,12 @@
 package com.rodcollab.lingoleap
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rodcollab.lingoleap.api.model.Meaning
 import com.rodcollab.lingoleap.collections.search.domain.GetWordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,8 +21,21 @@ data class WordDetails(
 class WordDetailsViewModel @Inject constructor(
     private val getWord: GetWordUseCase,
     private val translation: TranslatorApiService,
+    private val repository: TranslationRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+
+    private val _languages = MutableStateFlow(emptyList<LanguageOption>())
+    val languages = _languages.asStateFlow()
+
+    fun loadLanguages() {
+        viewModelScope.launch {
+            repository.loadLanguages {
+                _languages.value = it
+            }
+        }
+    }
 
     private val _wordId = savedStateHandle.get<String>("word").orEmpty()
 
@@ -49,32 +62,17 @@ class WordDetailsViewModel @Inject constructor(
 
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), initialValue = WordDetails())
 
-    fun translate(langCode: String,text: String, successful: (String) -> Unit) {
+    suspend fun translate(langCode: String, text: String, successful: (String) -> Unit) {
 
         viewModelScope.launch {
-            val some = translation.translate(langCode, "en", text)
-
-            if (some.isSuccessful) {
-                successful(some.body()?.data!!.translatedText)
+            val translatedText = translation.translate(langCode,"en", text)
+            Log.d("langCode", langCode)
+            if(translatedText.isSuccessful) {
+                successful(translatedText.body()!!.data.translatedText)
             }
         }
     }
 
-    private val _languages = mutableListOf<LanguageOption>()
-
-    private val _languagesFlow = MutableStateFlow(_languages)
-    val languages = _languagesFlow.value
-    fun getLanguages() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = translation.getLanguages()
-            if (result.isSuccessful) {
-                result.body()?.data?.languages?.map {
-                    _languages.add(LanguageOption(code = it.code, name = it.name))
-                    _languagesFlow.value = _languages
-                }
-            }
-        }
-    }
 }
 
 data class LanguageOption(

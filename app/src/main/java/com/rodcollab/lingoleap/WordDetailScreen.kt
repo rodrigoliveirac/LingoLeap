@@ -17,14 +17,19 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.*
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
@@ -35,8 +40,7 @@ fun WordDetailScreen(
 ) {
 
     val viewModel by wordDetailsViewModel.word.collectAsState()
-
-    val languages = wordDetailsViewModel.languages
+    val languages by wordDetailsViewModel.languages.collectAsState()
 
     val pagerState = rememberPagerState(pageCount = {
         2
@@ -56,13 +60,29 @@ fun WordDetailScreen(
 
     var isLoading by rememberSaveable { mutableStateOf(true) }
 
-    var selectedLanguage by remember { mutableStateOf<(String?) -> Unit>({})}
+    var selectedLanguage by remember { mutableStateOf<(String?) -> Unit>({}) }
 
-    var langCode by remember { mutableStateOf("pt")}
+    var langCode by remember { mutableStateOf(Locale.getDefault().language) }
+
+    var wordTranslated by remember { mutableStateOf("") }
+
+    var isWordTranslated by remember { mutableStateOf(false) }
+
+    val scope = LocalLifecycleOwner.current.lifecycleScope
 
     DisposableEffect(Unit) {
-        wordDetailsViewModel.getLanguages()
-        onDispose {  }
+        scope.launch {
+            wordDetailsViewModel.translate(langCode = langCode, wordDetailsViewModel.wordId) {
+                wordTranslated = it
+                isWordTranslated = true
+            }
+        }
+
+        onDispose { }
+    }
+
+    LaunchedEffect(Unit) {
+        wordDetailsViewModel.loadLanguages()
     }
 
     LaunchedEffect(meaningIndex, pagerState) {
@@ -85,7 +105,7 @@ fun WordDetailScreen(
         }
 
 
-        wordDetailsViewModel.translate(langCode,actualText) {
+        wordDetailsViewModel.translate(langCode, actualText) {
             translatedText = it
             isLoading = false
         }
@@ -93,10 +113,26 @@ fun WordDetailScreen(
     }
 
     selectedLanguage = { selectedLang ->
-        if(selectedLang != null) {
+        isLoading = true
+        if (selectedLang != null) {
             langCode = selectedLang
-            wordDetailsViewModel.translate(langCode,actualText) { newTranslatedText ->
-                translatedText = newTranslatedText
+            scope.launch {
+                scope.launch {
+                    wordDetailsViewModel.translate(langCode, actualText) { newTranslatedText ->
+                        translatedText = newTranslatedText
+                        isLoading = false
+                    }
+                }
+                scope.launch {
+                    wordDetailsViewModel.translate(
+                        langCode = langCode,
+                        wordDetailsViewModel.wordId
+                    ) {
+                        wordTranslated = it
+                        isWordTranslated = true
+                        isLoading = false
+                    }
+                }
             }
         }
     }
@@ -114,7 +150,7 @@ fun WordDetailScreen(
             } else {
                 example
             }
-            wordDetailsViewModel.translate(langCode,actualText) {
+            wordDetailsViewModel.translate(langCode, actualText) {
 
                 translatedText = it
                 isLoading = false
@@ -135,11 +171,34 @@ fun WordDetailScreen(
             Column(modifier = Modifier.padding(top = 32.dp, start = 16.dp, end = 16.dp)) {
 
 
-                Text(
-                    modifier = Modifier.padding(start = 12.dp),
-                    fontSize = 32.sp,
-                    text = wordDetailsViewModel.wordId
-                )
+                Row {
+                    Text(
+                        modifier = Modifier.padding(start = 12.dp),
+                        fontSize = 32.sp,
+                        text = wordDetailsViewModel.wordId
+                    )
+                    Box {
+                        if (isLoading && !isWordTranslated) {
+                            CircularProgressIndicator(
+                                strokeWidth = 1.dp,
+                                strokeCap = StrokeCap.Square,
+                                color = Color(255, 20, 147),
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(72.dp)
+                                    .padding(24.dp)
+                            )
+                        } else {
+                            Text(
+                                modifier = Modifier.padding(start = 12.dp),
+                                fontSize = 32.sp,
+                                color = Color.LightGray,
+                                text = "($wordTranslated)"
+                            )
+                        }
+                    }
+
+                }
 
                 Row(
                     modifier = Modifier
@@ -244,7 +303,7 @@ fun WordDetailScreen(
                         .padding(top = 32.dp)
                         .align(Alignment.CenterHorizontally), text = "Translate to"
                 )
-                TranslateComponent(selectedLanguage,languages, isLoading, translatedText)
+                TranslateComponent(selectedLanguage, languages, isLoading, translatedText)
             }
         }
     }
