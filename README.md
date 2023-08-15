@@ -1,7 +1,7 @@
 # LingoLeap App 🍎
 That's the new way to learn english! :)
 
-## Features
+## Features 🔬
 
 🔎 Word search.
 > 
@@ -11,15 +11,17 @@ That's the new way to learn english! :)
 > 
 🗣️ See how to pronounce the English word.
 >
- ## Screenshots
+ ## Screenshots 🛠️
  
 <img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/Screenshot_SearchWord.png" width="188" height="412">$~~~~~~~~~~~~~~~~~~~~~~$ <img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/Screenshot_WordDetails.png" width="188" height="412"> $~~~~~~~~~~~~~~~~~~~~~~$ <img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/lastUpdatesLingo.gif" width="188" height="412"> 
 	
-## Technologies
+## Technologies 🛠️
 This Project is created with:
 * *Room*
 * *Compose*
 * *Dagger - Hilt*
+* *SavedStateHandle*
+* *Flow*
 * *Coroutines*
 * *Navigation*
 * *ViewModel*
