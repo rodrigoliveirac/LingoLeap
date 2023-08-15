@@ -1,4 +1,4 @@
-# LingoLeap
+# LingoLeap App 🍎
 That's the new way to learn english! :)
 
 ## Features
