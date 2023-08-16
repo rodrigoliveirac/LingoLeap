@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel = hiltViewModel()) {
+fun HistoryScreen(modifier: Modifier, toDetailsScreen: (String) -> Unit, viewModel: HistoryViewModel = hiltViewModel()) {
 
     val state by viewModel.state.collectAsState()
 
@@ -34,7 +34,7 @@ fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel = hiltViewMode
             items(state.list) { word ->
                 SearchWordItem(
                     wordItemUiState = word,
-                    onClick = {},
+                    toDetailsScreen = toDetailsScreen,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -45,7 +45,7 @@ fun HistoryScreen(modifier: Modifier, viewModel: HistoryViewModel = hiltViewMode
 @Composable
 fun SearchWordItem(
     wordItemUiState: SearchedWordItemState,
-    onClick: () -> Unit,
+    toDetailsScreen: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -54,7 +54,7 @@ fun SearchWordItem(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colors.surface)
-            .clickable { onClick() },
+            .clickable { toDetailsScreen(wordItemUiState.name) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

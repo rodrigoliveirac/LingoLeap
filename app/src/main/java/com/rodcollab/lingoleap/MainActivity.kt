@@ -58,6 +58,9 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(paddingValues),
+                                toDetailsScreen = { word ->
+                                    navController.navigate("word_details/$word")
+                                },
                             )
                         }
                         composable("profile") {
