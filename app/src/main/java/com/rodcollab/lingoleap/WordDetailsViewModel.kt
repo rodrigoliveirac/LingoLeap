@@ -42,32 +42,31 @@ class WordDetailsViewModel @Inject constructor(
     val wordId = _wordId
 
     val word: StateFlow<WordDetails> = flow {
-        val word = getWord(_wordId)
+        val word = getWord(_wordId).map {
 
-        val audioUri = word[0].arrayInformation[0].phonetics.map {
-            var uri = ""
-            if (it.audio?.isNotBlank() == true) {
-                uri = it.audio
-            }
-            AudioUri(audioUri = uri)
-        }[0]
+            val audioUri = it.arrayInformation[0].phonetics.map { phonetic ->
+                var uri = ""
+                if (phonetic.audio?.isNotBlank() == true) {
+                    uri = phonetic.audio
+                }
+                AudioUri(audioUri = uri)
+            }[0]
 
-        emit(
             WordDetails(
                 word = _wordId,
-                meanings = word[0].arrayInformation[0].meanings,
+                meanings = it.arrayInformation[0].meanings,
                 audio = audioUri.audioUri,
             )
-        )
-
+        }
+        emit(word.first())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), initialValue = WordDetails())
 
     suspend fun translate(langCode: String, text: String, successful: (String) -> Unit) {
 
         viewModelScope.launch {
-            val translatedText = translation.translate(langCode,"en", text)
+            val translatedText = translation.translate(langCode, "en", text)
             Log.d("langCode", langCode)
-            if(translatedText.isSuccessful) {
+            if (translatedText.isSuccessful) {
                 successful(translatedText.body()!!.data.translatedText)
             }
         }

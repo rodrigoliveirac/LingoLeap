@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -85,31 +84,32 @@ fun WordDetailScreen(
         wordDetailsViewModel.loadLanguages()
     }
 
-    LaunchedEffect(meaningIndex, pagerState) {
+    if(viewModel.meanings.isNotEmpty()) {
+        LaunchedEffect(meaningIndex, pagerState) {
 
-        isLoading = true
-        delay(500)
+            isLoading = true
 
-        definition = viewModel.meanings[meaningIndex].definitions[0].definition.toString()
-            .ifEmpty { "Sorry. We don't have a definition for this" }
-        example = if (viewModel.meanings[meaningIndex].definitions[0].example != null) {
-            viewModel.meanings[meaningIndex].definitions[0].example.toString()
-        } else {
-            "Sorry. We don't have an example for this word"
+            definition = viewModel.meanings[meaningIndex].definitions[0].definition.toString()
+                .ifEmpty { "Sorry. We don't have a definition for this" }
+            example = if (viewModel.meanings[meaningIndex].definitions[0].example != null) {
+                viewModel.meanings[meaningIndex].definitions[0].example.toString()
+            } else {
+                "Sorry. We don't have an example for this word"
+            }
+
+            actualText = if (actualPage == 0) {
+                definition
+            } else {
+                example
+            }
+
+
+            wordDetailsViewModel.translate(langCode, actualText) {
+                translatedText = it
+                isLoading = false
+            }
+
         }
-
-        actualText = if (actualPage == 0) {
-            definition
-        } else {
-            example
-        }
-
-
-        wordDetailsViewModel.translate(langCode, actualText) {
-            translatedText = it
-            isLoading = false
-        }
-
     }
 
     selectedLanguage = { selectedLang ->
