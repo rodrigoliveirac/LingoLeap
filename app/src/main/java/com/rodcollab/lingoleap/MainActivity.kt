@@ -20,9 +20,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.rodcollab.lingoleap.profile.ProfileScreen
-import com.rodcollab.lingoleap.profile.SavedScreen
-import com.rodcollab.lingoleap.search.SearchScreen
+import com.rodcollab.lingoleap.features.history.HistoryScreen
+import com.rodcollab.lingoleap.features.profile.ProfileScreen
+import com.rodcollab.lingoleap.features.profile.SavedScreen
+import com.rodcollab.lingoleap.features.word.detail.WordDetailScreen
+import com.rodcollab.lingoleap.features.word.search.SearchScreen
 import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 import dagger.hilt.android.AndroidEntryPoint
 

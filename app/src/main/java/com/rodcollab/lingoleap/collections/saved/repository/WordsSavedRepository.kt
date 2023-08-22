@@ -1,6 +1,6 @@
 package com.rodcollab.lingoleap.collections.saved.repository
 
-import com.rodcollab.lingoleap.search.WordSaved
+import com.rodcollab.lingoleap.features.word.search.WordSaved
 
 interface WordsSavedRepository {
 

@@ -1,7 +1,7 @@
 package com.rodcollab.lingoleap.collections.history.repository
 
-import com.rodcollab.lingoleap.search.SearchedWordDomain
-import com.rodcollab.lingoleap.search.Word
+import com.rodcollab.lingoleap.features.word.search.SearchedWordDomain
+import com.rodcollab.lingoleap.features.word.search.Word
 
 interface SearchHistory {
 

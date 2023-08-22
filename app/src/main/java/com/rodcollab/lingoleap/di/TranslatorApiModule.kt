@@ -1,6 +1,6 @@
 package com.rodcollab.lingoleap.di
 
-import com.rodcollab.lingoleap.ApiKeyInterceptor
+import com.rodcollab.lingoleap.core.networking.dictionary.ApiKeyInterceptor
 import com.rodcollab.lingoleap.TranslatorApiService
 import com.rodcollab.lingoleap.TranslatorApiService.Companion.BASE_URL
 import dagger.Module

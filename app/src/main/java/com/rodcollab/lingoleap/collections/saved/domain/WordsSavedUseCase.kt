@@ -1,6 +1,6 @@
 package com.rodcollab.lingoleap.collections.saved.domain
 
-import com.rodcollab.lingoleap.profile.SavedWordItemState
+import com.rodcollab.lingoleap.features.profile.SavedWordItemState
 
 interface WordsSavedUseCase {
 

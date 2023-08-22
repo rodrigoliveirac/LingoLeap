@@ -1,7 +1,7 @@
 package com.rodcollab.lingoleap.di
 
-import com.rodcollab.lingoleap.TranslationRepository
-import com.rodcollab.lingoleap.TranslationRepositoryImpl
+import com.rodcollab.lingoleap.features.word.translation.TranslationRepository
+import com.rodcollab.lingoleap.features.word.translation.TranslationRepositoryImpl
 import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepository
 import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepositoryImpl
 import com.rodcollab.lingoleap.collections.history.repository.SearchHistory

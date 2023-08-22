@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.rodcollab.lingoleap.core.database.SavedWord
-import com.rodcollab.lingoleap.search.WordSaved
+import com.rodcollab.lingoleap.features.word.search.WordSaved
 
 @Dao
 interface SavedWordDao {
