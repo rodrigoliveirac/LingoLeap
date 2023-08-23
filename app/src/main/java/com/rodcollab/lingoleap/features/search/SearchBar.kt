@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.features.word.search
+package com.rodcollab.lingoleap.features.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

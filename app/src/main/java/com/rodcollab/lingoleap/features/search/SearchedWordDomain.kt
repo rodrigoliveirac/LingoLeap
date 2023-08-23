@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.features.word.search
+package com.rodcollab.lingoleap.features.search
 
 data class SearchedWordDomain(
     val name: String,

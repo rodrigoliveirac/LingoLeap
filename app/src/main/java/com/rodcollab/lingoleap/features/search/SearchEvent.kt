@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.features.word.search
+package com.rodcollab.lingoleap.features.search
 
 sealed class SearchEvent {
     data class OnQueryChange(val query: String) : SearchEvent()

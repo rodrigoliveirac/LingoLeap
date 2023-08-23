@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.features.word.search
+package com.rodcollab.lingoleap.features.search
 
 import com.rodcollab.lingoleap.core.networking.dictionary.model.Meaning
 import com.rodcollab.lingoleap.core.networking.dictionary.model.InfoWord

@@ -1,12 +1,12 @@
-package com.rodcollab.lingoleap.collections.history.repository
+package com.rodcollab.lingoleap.features.history.repository
 
 import com.rodcollab.lingoleap.core.database.SearchHistoryDao
 import com.rodcollab.lingoleap.core.networking.dictionary.model.DefinitionEntity
 import com.rodcollab.lingoleap.core.networking.dictionary.model.MeaningEntity
 import com.rodcollab.lingoleap.core.networking.dictionary.model.WordEntity
 import com.rodcollab.lingoleap.features.word.SearchedWord
-import com.rodcollab.lingoleap.features.word.search.SearchedWordDomain
-import com.rodcollab.lingoleap.features.word.search.Word
+import com.rodcollab.lingoleap.features.search.SearchedWordDomain
+import com.rodcollab.lingoleap.features.search.Word
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -43,7 +43,8 @@ class SearchHistoryImpl @Inject constructor(
                         dao.addDefinition(
                             DefinitionEntity(
                                 definitionId = definitionId,
-                                meaningCreatorId = meaningId,
+                                word = word.name,
+                                partOfSpeechCreator = meaning.partOfSpeech,
                                 definition = definition.definition ?: "",
                                 example = definition.example ?: ""
                             )

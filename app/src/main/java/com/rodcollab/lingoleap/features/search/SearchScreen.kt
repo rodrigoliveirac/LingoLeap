@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.features.word.search
+package com.rodcollab.lingoleap.features.search
 
 import android.media.AudioAttributes
 import android.media.MediaPlayer
