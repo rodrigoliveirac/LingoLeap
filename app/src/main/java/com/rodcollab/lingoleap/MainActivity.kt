@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,10 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.rodcollab.lingoleap.features.history.HistoryScreen
-import com.rodcollab.lingoleap.features.profile.ProfileScreen
-import com.rodcollab.lingoleap.features.profile.SavedScreen
 import com.rodcollab.lingoleap.features.word.detail.WordDetailScreen
-import com.rodcollab.lingoleap.features.word.search.SearchScreen
+import com.rodcollab.lingoleap.features.search.SearchScreen
 import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -65,24 +62,12 @@ class MainActivity : ComponentActivity() {
                                 },
                             )
                         }
-                        composable("profile") {
-                            ProfileScreen(
-                                navController = navController,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(paddingValues)
-                            )
-                        }
-                        composable("saved_screen") {
-                            SavedScreen(
-                                navController = navController,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(paddingValues)
-                            )
-                        }
-                        composable("word_details/{word}", arguments = listOf(navArgument("word") { type = NavType.StringType})) {
-                            WordDetailScreen(onNavigateBack = { navController.navigateUp() })
+                        composable(
+                            "word_details/{word}",
+                            arguments = listOf(navArgument("word") { type = NavType.StringType })
+                        ) {
+                            WordDetailScreen(
+                                onNavigateBack = { navController.navigateUp() })
                         }
                     }
                 }
@@ -100,7 +85,6 @@ data class BottomNavigationItemData(
 val bottomNavigationItems = listOf(
     BottomNavigationItemData("history", Icons.Default.History, "History"),
     BottomNavigationItemData("search", Icons.Default.Search, "Search"),
-    BottomNavigationItemData("profile", Icons.Default.Person, "Profile")
 )
 
 @Composable
