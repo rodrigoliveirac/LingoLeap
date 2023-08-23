@@ -1,8 +1,8 @@
-package com.rodcollab.lingoleap
+package com.rodcollab.lingoleap.features.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rodcollab.lingoleap.collections.history.repository.SearchHistory
+import com.rodcollab.lingoleap.features.history.repository.SearchHistory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

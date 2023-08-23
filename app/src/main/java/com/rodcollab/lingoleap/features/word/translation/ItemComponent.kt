@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap.features.word
+package com.rodcollab.lingoleap.features.word.translation
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

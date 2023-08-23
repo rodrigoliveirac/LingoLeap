@@ -18,8 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.rodcollab.lingoleap.HistoryViewModel
-import com.rodcollab.lingoleap.SearchedWordItemState
 
 @Composable
 fun HistoryScreen(modifier: Modifier, toDetailsScreen: (String) -> Unit, viewModel: HistoryViewModel = hiltViewModel()) {

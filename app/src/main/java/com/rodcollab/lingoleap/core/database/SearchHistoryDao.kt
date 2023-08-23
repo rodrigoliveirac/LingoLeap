@@ -22,15 +22,24 @@ interface SearchHistoryDao {
     @Query("SELECT * FROM meaning WHERE meaningId = :meaningId")
     fun getMeaningWithDefinitions(meaningId: String): MeaningWithDefinitions
 
-    @Transaction
     @Query("SELECT * FROM word WHERE word = :word")
-    fun getWordWithMeanings(word: String) : WordWithMeanings
+    fun getWordBy(word: String) : WordEntity
+
+    @Query("SELECT DISTINCT partOfSpeech FROM meaning WHERE wordCreatorId = :word")
+    fun getPartOfSpeeches(word: String) : List<String>
 
     @Query("SELECT * FROM word WHERE word = :wordId")
     fun findWordById(wordId:String) : Flow<WordEntity>
 
     @Query("SELECT * FROM meaning WHERE wordCreatorId = :wordCreatorId")
     fun meaningsByWordCreatorId(wordCreatorId:String) : List<MeaningEntity>
+
+    @Query("SELECT * FROM definition WHERE word = :word")
+    fun definitionsBy(word: String,): List<DefinitionEntity>
+
+    @Transaction
+    @Query("SELECT * FROM definition WHERE word = :word AND partOfSpeechCreator = :partOfSpeech")
+    fun getMeaningsAndDefinitions(word: String, partOfSpeech: String) : List<DefinitionEntity>
 
     @Insert
     suspend fun addSearchedWord(word: SearchedWord)

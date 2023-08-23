@@ -3,21 +3,24 @@ package com.rodcollab.lingoleap.features.word.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rodcollab.lingoleap.features.word.translation.TranslationRepository
 import com.rodcollab.lingoleap.TranslatorApiService
-import com.rodcollab.lingoleap.collections.search.domain.GetWordUseCase
 import com.rodcollab.lingoleap.core.database.SearchHistoryDao
+import com.rodcollab.lingoleap.features.word.translation.TranslationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class WordDetails(
     val word: String = "",
-    val meanings: List<MeaningDomain> = listOf(),
     val audio: String = "",
+    val partOfSpeeches: List<String> = listOf(),
+    val partOfSpeech: String = "",
+    val definitionsAndExamples: List<DefinitionDomain> = listOf(),
 )
 
 data class MeaningDomain(
@@ -32,13 +35,11 @@ data class DefinitionDomain(
 
 @HiltViewModel
 class WordDetailsViewModel @Inject constructor(
-    private val getWord: GetWordUseCase,
     private val translation: TranslatorApiService,
     private val repository: TranslationRepository,
     private val historyDao: SearchHistoryDao,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
 
     private val _languages = MutableStateFlow(emptyList<LanguageOption>())
     val languages = _languages.asStateFlow()
@@ -53,39 +54,34 @@ class WordDetailsViewModel @Inject constructor(
 
     private val _wordId = savedStateHandle.get<String>("word").orEmpty()
 
-    val wordId = _wordId
-
-    val word: StateFlow<WordDetails> = flow {
-
-        val source = withContext(Dispatchers.IO) {
-            historyDao.getWordWithMeanings(_wordId)
-        }
-
-        val audio = withContext(Dispatchers.IO) { source.word.audio }
-
-        val meanings = withContext(Dispatchers.IO) {
-            source.meanings.map { meaningEntity ->
-                val definitions =
-                    historyDao.getMeaningWithDefinitions(meaningEntity.meaningId).definitions.map { definitionEntity ->
-                        DefinitionDomain(
-                            definition = definitionEntity.definition,
-                            example = definitionEntity.example
-                        )
-                    }
-                MeaningDomain(
-                    partOfSpeech = meaningEntity.partOfSpeech,
-                    definitions = definitions
-                )
+    init {
+        viewModelScope.launch {
+            val source = withContext(Dispatchers.IO) { historyDao.getWordBy(_wordId) }
+            val audio = withContext(Dispatchers.IO) { source.audio }
+            val partOfSpeeches = withContext(Dispatchers.IO) { historyDao.getPartOfSpeeches(_wordId) }
+            val definitionsAndExamples = withContext(Dispatchers.IO) {
+                historyDao.definitionsBy(_wordId).map {
+                    DefinitionDomain(
+                        definition = it.definition,
+                        example = it.example
+                    )
+                }
             }
+
+            wordDetailsStateUi.value =
+                wordDetailsStateUi.value.copy(
+                    word = _wordId,
+                    audio = audio,
+                    partOfSpeeches = partOfSpeeches,
+                    partOfSpeech = partOfSpeeches[0],
+                    definitionsAndExamples = definitionsAndExamples
+                )
         }
+    }
 
-        emit(WordDetails(word = _wordId, meanings = meanings, audio = audio))
+    private val wordDetailsStateUi = MutableStateFlow(WordDetails())
 
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(1000),
-        initialValue = WordDetails()
-    )
+    val word: StateFlow<WordDetails> = wordDetailsStateUi.asStateFlow()
 
     suspend fun translate(langCode: String, text: String, successful: (String) -> Unit) {
 
@@ -99,7 +95,24 @@ class WordDetailsViewModel @Inject constructor(
         }
     }
 
+    fun getDefinitionsBy(partOfSpeech: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val definitionsAndExamples =
+                historyDao.getMeaningsAndDefinitions(_wordId, partOfSpeech).map {
+                    DefinitionDomain(
+                        definition = it.definition,
+                        example = it.example
+                    )
+                }
+            wordDetailsStateUi.value = wordDetailsStateUi.value.copy(partOfSpeech = partOfSpeech, definitionsAndExamples = definitionsAndExamples)
+        }
+    }
+
 }
+
+data class DefinitionsUiState(
+    val definitions: List<DefinitionDomain> = listOf()
+)
 
 data class LanguageOption(
     val code: String,

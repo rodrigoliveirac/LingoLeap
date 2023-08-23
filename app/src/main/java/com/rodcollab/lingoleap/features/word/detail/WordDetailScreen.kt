@@ -3,9 +3,9 @@ package com.rodcollab.lingoleap.features.word.detail
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -31,8 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import com.rodcollab.lingoleap.R
-import com.rodcollab.lingoleap.features.word.ItemComponent
-import kotlinx.coroutines.launch
+import com.rodcollab.lingoleap.features.word.translation.ItemComponent
 import java.util.*
 
 
@@ -43,26 +43,14 @@ fun WordDetailScreen(
     wordDetailsViewModel: WordDetailsViewModel = hiltViewModel()
 ) {
 
-    val viewModel by wordDetailsViewModel.word.collectAsState()
+    val wordDetailsUiState by wordDetailsViewModel.word.collectAsState()
     val languages by wordDetailsViewModel.languages.collectAsState()
 
-    val pagerState = rememberPagerState(pageCount = {
-        2
-    })
-
-    var actualPage by rememberSaveable { mutableStateOf(2) }
-
-    var meaningIndex by rememberSaveable { mutableStateOf(0) }
-
-    var definition by rememberSaveable { mutableStateOf("") }
-
-    var example by rememberSaveable { mutableStateOf("") }
+    var actualPartOfSpeech by rememberSaveable { mutableStateOf(wordDetailsUiState.partOfSpeech) }
 
     var translatedText by rememberSaveable { mutableStateOf("") }
 
-    var actualText by rememberSaveable { mutableStateOf(definition) }
-
-    var isLoading by rememberSaveable { mutableStateOf(true) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
 
     var selectedLanguage by remember { mutableStateOf<(String?) -> Unit>({}) }
 
@@ -75,13 +63,12 @@ fun WordDetailScreen(
     val scope = LocalLifecycleOwner.current.lifecycleScope
 
     DisposableEffect(Unit) {
-        scope.launch {
-            wordDetailsViewModel.translate(langCode = langCode, wordDetailsViewModel.wordId) {
-                wordTranslated = it
-                isWordTranslated = true
-            }
-        }
-
+//        scope.launch {
+//            wordDetailsViewModel.translate(langCode = langCode, wordDetailsViewModel.wordId) {
+//                wordTranslated = it
+//                isWordTranslated = true
+//            }
+//        }
         onDispose { }
     }
 
@@ -89,42 +76,16 @@ fun WordDetailScreen(
         wordDetailsViewModel.loadLanguages()
     }
 
-    if (viewModel.meanings.isNotEmpty()) {
-        LaunchedEffect(meaningIndex, pagerState) {
-
-            isLoading = true
-
-            definition = viewModel.meanings[meaningIndex].definitions[0].definition.toString()
-                .ifEmpty { "Sorry. We don't have a definition for this" }
-            example = viewModel.meanings[meaningIndex].definitions[0].example.ifBlank {
-                "Sorry. We don't have an example for this word"
-            }
-
-            actualText = if (actualPage == 0) {
-                definition
-            } else {
-                example
-            }
-
-
-            wordDetailsViewModel.translate(langCode, actualText) {
-                translatedText = it
-                isLoading = false
-            }
-
-        }
-    }
-
-    selectedLanguage = { selectedLang ->
+    /*selectedLanguage = { selectedLang ->
         isLoading = true
         if (selectedLang != null) {
             langCode = selectedLang
             scope.launch {
                 scope.launch {
-                    wordDetailsViewModel.translate(langCode, actualText) { newTranslatedText ->
+                    *//*wordDetailsViewModel.translate(langCode, actualText) { newTranslatedText ->
                         translatedText = newTranslatedText
                         isLoading = false
-                    }
+                    }*//*
                 }
                 scope.launch {
                     wordDetailsViewModel.translate(
@@ -138,28 +99,8 @@ fun WordDetailScreen(
                 }
             }
         }
-    }
+    }*/
 
-
-
-    LaunchedEffect(pagerState) {
-
-        snapshotFlow { pagerState.currentPage }.collect { page ->
-
-            isLoading = true
-            actualPage = page
-            actualText = if (actualPage == 0) {
-                definition
-            } else {
-                example
-            }
-            wordDetailsViewModel.translate(langCode, actualText) {
-
-                translatedText = it
-                isLoading = false
-            }
-        }
-    }
     Scaffold(topBar = {
         TopAppBar() {
             IconButton(onClick = {
@@ -171,14 +112,22 @@ fun WordDetailScreen(
         }
     }) {
         Box(modifier = Modifier.padding(it)) {
-            Column(modifier = Modifier.padding(top = 32.dp, start = 16.dp, end = 16.dp)) {
+            Column(
+                modifier = Modifier.padding(
+                    top = 32.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 32.dp
+                )
+            ) {
 
 
                 Row {
                     Text(
                         modifier = Modifier.padding(start = 12.dp),
                         fontSize = 32.sp,
-                        text = wordDetailsViewModel.wordId
+                        fontWeight = FontWeight.Bold,
+                        text = wordDetailsUiState.word
                     )
                     Box {
                         if (isLoading && !isWordTranslated) {
@@ -191,32 +140,23 @@ fun WordDetailScreen(
                                     .size(72.dp)
                                     .padding(24.dp)
                             )
-                        } else {
-                            Text(
-                                modifier = Modifier.padding(start = 12.dp),
-                                fontSize = 32.sp,
-                                color = Color.LightGray,
-                                text = "($wordTranslated)"
-                            )
                         }
                     }
 
                 }
 
-                Row(
+                LazyRow(
                     modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .padding(start = 12.dp, top = 16.dp)
+                        .padding(start = 12.dp, top = 16.dp, end = 12.dp)
                 ) {
-                    viewModel.meanings.forEachIndexed { index, meaning ->
-
+                    items(wordDetailsUiState.partOfSpeeches) { partOfSpeech ->
                         Text(modifier = Modifier
                             .clickable {
-                                meaningIndex = index
+                                wordDetailsViewModel.getDefinitionsBy(partOfSpeech)
                             }
                             .border(
                                 1.dp,
-                                if (meaningIndex == index) Color(
+                                if (actualPartOfSpeech == partOfSpeech) Color(
                                     250,
                                     128,
                                     46
@@ -224,8 +164,8 @@ fun WordDetailScreen(
                                 RoundedCornerShape(2.dp)
                             )
                             .padding(start = 6.dp, top = 2.dp, bottom = 2.dp, end = 6.dp),
-                            text = meaning.partOfSpeech.toString(),
-                            fontSize = 10.sp)
+                            text = partOfSpeech,
+                            fontSize = 14.sp)
 
                         Spacer(modifier = Modifier.size(8.dp))
                     }
@@ -234,23 +174,30 @@ fun WordDetailScreen(
                 IconButton(onClick = { }) {
                     Icon(
                         modifier = Modifier
-                            .padding(top = 16.dp),
+                            .padding(top = 16.dp, bottom = 16.dp),
                         imageVector = Icons.Default.VolumeUp,
                         contentDescription = null
                     )
                 }
 
+                Text(
+                    color = Color.DarkGray,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 12.dp, bottom = 16.dp),
+                    fontSize = 32.sp,
+                    text = "Meanings"
+                )
+
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    viewModel.meanings.map { meaning ->
-                        items(meaning.definitions) { definition ->
-                            MeaningItemComponent(
-                                actualPage,
-                                pagerState,
-                                isLoading,
-                                definition.definition,
-                                definition.example
-                            )
-                        }
+
+
+                    items(wordDetailsUiState.definitionsAndExamples) { item ->
+                        MeaningItemComponent(
+                            isLoading,
+                            item.definition,
+                            item.example
+                        )
                     }
                 }
 
@@ -268,69 +215,93 @@ fun WordDetailScreen(
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun MeaningItemComponent(
-    actualPage: Int,
-    pagerState: PagerState,
     isLoading: Boolean,
     definition: String,
     example: String
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 12.dp, top = 16.dp, end = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        Spacer(
-            modifier = Modifier
-                .align(Alignment.Bottom)
-                .weight(1f)
-                .height(1.dp)
-                .background(Color.LightGray)
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .bottomBorder(
-                    1.dp,
-                    if (actualPage == 0) Color(250, 128, 46) else Color.LightGray
-                )
-                .padding(bottom = 8.dp), text = "Definitions"
-        )
-        Spacer(
-            modifier = Modifier
-                .align(Alignment.Bottom)
-                .weight(1f)
-                .height(1.dp)
-                .background(Color.LightGray)
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .bottomBorder(
-                    1.dp,
-                    if (actualPage == 1) Color(250, 128, 46) else Color.LightGray
-                )
-                .padding(bottom = 8.dp), text = "Sentences"
-        )
-        Spacer(
-            modifier = Modifier
-                .align(Alignment.Bottom)
-                .weight(1f)
-                .height(1.dp)
-                .background(Color.LightGray)
-        )
+
+    val state = rememberPagerState(pageCount = {
+        2
+    })
+
+    var actualPage by rememberSaveable { mutableStateOf(2) }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.currentPage }.collect { page ->
+            actualPage = page
+        }
     }
 
-    HorizontalPager(
-        state = pagerState,
-        beyondBoundsPageCount = 2,
-    ) { page ->
-        when (page) {
-            0 -> {
-                DefinitionsPage(isLoading = isLoading, definition = definition)
+    Card(
+        backgroundColor = Color(255, 255, 255, 255),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, top = 16.dp, end = 12.dp, bottom = 8.dp),
+        elevation = 4.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .weight(1f)
+                        .height(1.dp)
+                        .background(Color.LightGray)
+                )
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .bottomBorder(
+                            1.dp,
+                            if (actualPage == 0) Color(250, 128, 46) else Color.LightGray
+                        )
+                        .padding(bottom = 8.dp), text = "Definition"
+                )
+                Spacer(
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .weight(1f)
+                        .height(1.dp)
+                        .background(Color.LightGray)
+                )
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .bottomBorder(
+                            1.dp,
+                            if (actualPage == 1) Color(250, 128, 46) else Color.LightGray
+                        )
+                        .padding(bottom = 8.dp), text = "Sentences"
+                )
+                Spacer(
+                    modifier = Modifier
+                        .align(Alignment.Bottom)
+                        .weight(1f)
+                        .height(1.dp)
+                        .background(Color.LightGray)
+                )
             }
-            1 -> SentencesPage(isLoading = isLoading, sentence = example)
+
+            HorizontalPager(
+                state = state,
+                beyondBoundsPageCount = 2,
+            ) { page ->
+                when (page) {
+                    0 -> {
+                        DefinitionsPage(isLoading = isLoading, definition = definition)
+                    }
+
+                    1 -> SentencesPage(isLoading = isLoading, sentence = example)
+                }
+            }
         }
     }
 }

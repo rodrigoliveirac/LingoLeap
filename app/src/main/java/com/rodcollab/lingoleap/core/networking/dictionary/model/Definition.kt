@@ -1,5 +1,6 @@
 package com.rodcollab.lingoleap.core.networking.dictionary.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -25,10 +26,9 @@ data class WordEntity(
 
 @Entity(tableName = "meaning")
 data class MeaningEntity(
-    @PrimaryKey
-    val meaningId: String,
-    val wordCreatorId: String,
-    val partOfSpeech: String
+    @PrimaryKey val meaningId: String,
+    @ColumnInfo("wordCreatorId")val wordCreatorId: String?,
+    @ColumnInfo("partOfSpeech")val partOfSpeech: String?
 )
 
 data class WordWithMeanings(
@@ -44,7 +44,8 @@ data class WordWithMeanings(
 data class DefinitionEntity(
     @PrimaryKey
     val definitionId: String,
-    val meaningCreatorId: String,
+    val word: String,
+    val partOfSpeechCreator: String,
     val definition: String,
     val example: String
 )
@@ -52,8 +53,8 @@ data class DefinitionEntity(
 data class MeaningWithDefinitions(
     @Embedded val meaning: MeaningEntity,
     @Relation(
-        parentColumn = "meaningId",
-        entityColumn = "meaningCreatorId"
+        parentColumn = "partOfSpeech",
+        entityColumn = "partOfSpeechCreator"
     )
     val definitions: List<DefinitionEntity>
 )
