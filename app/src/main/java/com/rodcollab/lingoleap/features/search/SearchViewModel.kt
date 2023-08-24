@@ -58,7 +58,6 @@ class SearchViewModel @Inject constructor(
                     _state.value.infoItem = it.copy(
                         word = event.word.name,
                         meanings = event.word.arrayInformation[0].meanings,
-                        saved = event.word.saved
                     )
                 }
 

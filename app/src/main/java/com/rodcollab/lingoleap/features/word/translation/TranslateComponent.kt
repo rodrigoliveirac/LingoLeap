@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap
+package com.rodcollab.lingoleap.features.word.translation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.MaterialTheme
@@ -23,7 +22,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -85,7 +83,7 @@ fun TranslateComponent(
             elevation = CardDefaults.cardElevation(5.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            if (isLoading) {
+            /*if (isLoading) {
                 CircularProgressIndicator(
                     strokeWidth = 1.dp,
                     strokeCap = StrokeCap.Square,
@@ -96,16 +94,17 @@ fun TranslateComponent(
                         .padding(24.dp)
                 )
             } else {
-                Text(
-                    modifier = Modifier.padding(
-                        top = 16.dp,
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 24.dp
-                    ),
-                    text = text
-                )
-            }
+
+            }*/
+            Text(
+                modifier = Modifier.padding(
+                    top = 16.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 24.dp
+                ),
+                text = "mock translated text"
+            )
         }
         Box(modifier = Modifier.align(Alignment.Center)) {
             DropdownMenu(

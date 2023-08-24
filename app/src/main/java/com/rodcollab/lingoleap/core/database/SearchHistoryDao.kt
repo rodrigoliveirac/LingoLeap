@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.rodcollab.lingoleap.core.networking.dictionary.model.*
-import com.rodcollab.lingoleap.features.word.SearchedWord
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -40,9 +39,6 @@ interface SearchHistoryDao {
     @Transaction
     @Query("SELECT * FROM definition WHERE word = :word AND partOfSpeechCreator = :partOfSpeech")
     fun getMeaningsAndDefinitions(word: String, partOfSpeech: String) : List<DefinitionEntity>
-
-    @Insert
-    suspend fun addSearchedWord(word: SearchedWord)
 
     @Query("SELECT * FROM word")
     suspend fun fetchSearchHistory(): List<WordEntity>

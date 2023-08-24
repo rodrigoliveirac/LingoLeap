@@ -23,7 +23,6 @@ data class InfoItemClicked(
 data class Word(
     val name: String,
     val arrayInformation: List<InfoWord>,
-    val saved: Boolean
 )
 
 data class WordSaved(

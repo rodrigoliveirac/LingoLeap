@@ -11,6 +11,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -32,11 +34,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import com.rodcollab.lingoleap.R
+import com.rodcollab.lingoleap.features.word.translation.TranslateComponent
 import com.rodcollab.lingoleap.features.word.translation.ItemComponent
 import java.util.*
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun WordDetailScreen(
     onNavigateBack: () -> Unit,
@@ -125,7 +127,7 @@ fun WordDetailScreen(
                 Row {
                     Text(
                         modifier = Modifier.padding(start = 12.dp),
-                        fontSize = 32.sp,
+                        fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         text = wordDetailsUiState.word
                     )
@@ -174,7 +176,7 @@ fun WordDetailScreen(
                 IconButton(onClick = { }) {
                     Icon(
                         modifier = Modifier
-                            .padding(top = 16.dp, bottom = 16.dp),
+                            .padding(top = 16.dp, bottom = 24.dp),
                         imageVector = Icons.Default.VolumeUp,
                         contentDescription = null
                     )
@@ -184,9 +186,10 @@ fun WordDetailScreen(
                     color = Color.DarkGray,
                     modifier = Modifier
                         .align(Alignment.Start)
-                        .padding(start = 12.dp, bottom = 16.dp),
-                    fontSize = 32.sp,
-                    text = "Meanings"
+                        .padding(start = 12.dp, bottom = 8.dp),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Light,
+                    text = "meanings"
                 )
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -200,13 +203,6 @@ fun WordDetailScreen(
                         )
                     }
                 }
-
-                /* Text(
-                     modifier = Modifier
-                         .padding(top = 32.dp)
-                         .align(Alignment.CenterHorizontally), text = "Translate to"
-                 )
-                 TranslateComponent(selectedLanguage, languages, isLoading, translatedText)*/
             }
         }
     }
@@ -226,6 +222,14 @@ private fun MeaningItemComponent(
 
     var actualPage by rememberSaveable { mutableStateOf(2) }
 
+    var arrowClicked by remember { mutableStateOf(false) }
+
+    var showTranslationComponent by remember { mutableStateOf(false) }
+
+    LaunchedEffect(arrowClicked) {
+        showTranslationComponent = arrowClicked
+    }
+
     LaunchedEffect(state) {
         snapshotFlow { state.currentPage }.collect { page ->
             actualPage = page
@@ -241,10 +245,13 @@ private fun MeaningItemComponent(
         elevation = 4.dp
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -301,6 +308,26 @@ private fun MeaningItemComponent(
 
                     1 -> SentencesPage(isLoading = isLoading, sentence = example)
                 }
+            }
+
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = 16.dp),
+                onClick = { arrowClicked = !arrowClicked }) {
+                Icon(
+                    imageVector = if (showTranslationComponent) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+            if (arrowClicked) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally),
+                    text = "Translate to"
+                )
+                TranslateComponent({ }, emptyList(), isLoading, definition)
             }
         }
     }
