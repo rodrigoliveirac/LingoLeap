@@ -155,10 +155,11 @@ fun WordDetailScreen(
                         Text(modifier = Modifier
                             .clickable {
                                 wordDetailsViewModel.getDefinitionsBy(partOfSpeech)
+                                actualPartOfSpeech = partOfSpeech
                             }
                             .border(
                                 1.dp,
-                                if (actualPartOfSpeech == partOfSpeech) Color(
+                                if (wordDetailsUiState.partOfSpeech == partOfSpeech) Color(
                                     250,
                                     128,
                                     46
@@ -193,7 +194,6 @@ fun WordDetailScreen(
                 )
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-
 
                     items(wordDetailsUiState.definitionsAndExamples) { item ->
                         MeaningItemComponent(
