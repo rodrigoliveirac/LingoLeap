@@ -50,10 +50,6 @@ fun WordDetailScreen(
         onDispose { }
     }
 
-    LaunchedEffect(Unit) {
-        wordDetailsViewModel.loadLanguages()
-    }
-
     var scroll by remember { mutableStateOf(false) }
 
     var goTo by remember { mutableStateOf(false) }

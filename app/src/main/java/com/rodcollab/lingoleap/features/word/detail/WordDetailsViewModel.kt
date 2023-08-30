@@ -4,8 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rodcollab.lingoleap.GetWordDetailsUseCase
-import com.rodcollab.lingoleap.TranslatorApiService
-import com.rodcollab.lingoleap.features.word.translation.TranslationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,19 +13,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed interface ResourceUiState {
-
-    object Loading : ResourceUiState
-    data class Error(val throwable: Throwable) : ResourceUiState
-    data class Success(val data: Any) : ResourceUiState
-}
-
 data class WordDetailsUiState(
     val word: String = "",
     val audio: String = "",
     val partOfSpeech: String = "",
     val partOfSpeeches: List<String> = listOf(),
     val definitionsAndExamples: List<DefinitionDomain> = listOf(),
+    val songs: List<SongDomain> = listOf()
+)
+
+data class SongDomain(
+    val title: String,
+    val thumbnailUrl: String
 )
 
 data class DefinitionDomain(
@@ -44,31 +41,23 @@ class WordDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _languages = MutableStateFlow(emptyList<LanguageOption>())
-    val languages = _languages.asStateFlow()
-
-    fun loadLanguages() {
-        viewModelScope.launch {
-            repository.loadLanguages {
-                _languages.value = it
-            }
-        }
-    }
-
     private val _wordId = savedStateHandle.get<String>("word").orEmpty()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
 
             val dataSource = getWordUseCase(_wordId)
-
             wordDetailsStateUi.update {
                 WordDetailsUiState(
                     word = dataSource.word,
                     audio = dataSource.audio,
                     partOfSpeech = dataSource.partOfSpeech[0],
                     partOfSpeeches = dataSource.partOfSpeech,
-                    definitionsAndExamples = getMeaningsUseCase(_wordId,dataSource.partOfSpeech[0])
+                    definitionsAndExamples = getMeaningsUseCase(
+                        _wordId,
+                        dataSource.partOfSpeech[0]
+                    ),
+                    songs = emptyList()
                 )
             }
         }
@@ -77,18 +66,6 @@ class WordDetailsViewModel @Inject constructor(
     private val wordDetailsStateUi = MutableStateFlow(WordDetailsUiState())
 
     val word: StateFlow<WordDetailsUiState> = wordDetailsStateUi.asStateFlow()
-
-    suspend fun translate(langCode: String, text: String, successful: (String) -> Unit) {
-
-        viewModelScope.launch {
-            /*val translatedText = translation.translate(langCode, "en", text)
-            Log.d("langCode", langCode)
-            if (translatedText.isSuccessful) {
-                successful(translatedText.body()!!.translatedText)
-            }*/
-            successful("Mock Text")
-        }
-    }
 
     fun getDefinitionsBy(partOfSpeech: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -106,15 +83,7 @@ class WordDetailsViewModel @Inject constructor(
 
 }
 
-data class DefinitionsUiState(
-    val definitions: List<DefinitionDomain> = listOf()
-)
-
 data class LanguageOption(
     val code: String,
     val name: String
-)
-
-data class AudioUri(
-    val audioUri: String
 )
