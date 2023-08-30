@@ -37,7 +37,8 @@ fun WordItem(
             text = item.name,
             style = MaterialTheme.typography.body1,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 18.sp
         )
 
     }
