@@ -26,7 +26,6 @@ class SearchViewModel @Inject constructor(
     private val _state by lazy {
         MutableStateFlow(
             SearchState(
-                infoItem = InfoItemClicked(),
                 words = listCacheFlow.value
             )
         )
@@ -41,9 +40,11 @@ class SearchViewModel @Inject constructor(
                 }
 
             }
+
             is SearchEvent.OnSearch -> {
                 executeSearch()
             }
+
             is SearchEvent.OnClearHistory -> {
                 viewModelScope.launch {
                     listCache.clear()
@@ -52,106 +53,43 @@ class SearchViewModel @Inject constructor(
                     }
                 }
             }
-            is SearchEvent.OnWordClick -> {
 
-                _state.value.infoItem.let {
-                    _state.value.infoItem = it.copy(
-                        word = event.word.name,
-                        meanings = event.word.arrayInformation[0].meanings,
-                    )
-                }
-
-                event.word.arrayInformation[0].phonetics.onEach {
-                    if (it.audio?.isNotBlank() == true) {
-                        _state.value.let { currentState ->
-                            _state.value = currentState.copy(openDialog = true)
-                            _state.value.infoItem = currentState.infoItem.copy(audio = it.audio)
-                        }
-
-                        _state.value.infoItem.let { infoItemClicked ->
-                            _state.value.infoItem = infoItemClicked.copy(
-                                audio = infoItemClicked.audio,
-                            )
-                        }
-
-                    }
-                }
-
-            }
             is SearchEvent.OnSearchFocusChange -> {
                 _state.value = _state.value.copy(
-                    isHintVisible = !event.isFocused && _state.value.query.isBlank()
-                )
-            }
-            is SearchEvent.OpenDialog -> {
-                _state.value = _state.value.copy(
-                    openDialog = event.openDialog
-                )
-            }
-            is SearchEvent.OnSaveWord -> {
-                viewModelScope.launch {
-                    _state.value.infoItem.let { itemClicked ->
-                        _state.value = SearchState(
-                            query = _state.value.query,
-                            isHintVisible = _state.value.isHintVisible,
-                            isSearching = _state.value.isSearching,
-                            words = _state.value.words,
-                            openDialog = _state.value.openDialog,
-                            infoItem = InfoItemClicked(
-                                word = itemClicked.word,
-                                meanings = itemClicked.meanings,
-                                audio = itemClicked.audio,
-                            )
-                        )
-                    }
+                    isHintVisible = !event.isFocused && _state.value.query.isBlank(),
 
-                }
+                )
             }
+
         }
     }
 
     private fun executeSearch() {
         viewModelScope.launch {
 
-            withContext(Dispatchers.Main) {
-                _state.value = _state.value.copy(
-                    isSearching = true,
-                    words = listCacheFlow.value.reversed()
-                )
-            }
+            _state.value = _state.value.copy(
+                isSearching = true
+            )
+
 
             withContext(Dispatchers.IO) {
-                getWord(_state.value.query).map { infoItem ->
-                    listCache.add(WordItemUiState(element = infoItem))
-                    listCacheFlow.value = listCache
-                    searchHistory.add(infoItem)
-                }
-            }
 
-            withContext(Dispatchers.Main) {
+                try {
+                    getWord(_state.value.query).map { infoItem ->
+                        listCache.add(WordItemUiState(element = infoItem))
+                        listCacheFlow.value = listCache
+                        searchHistory.add(infoItem)
+                    }
+
+                } catch (e: Exception) {
+
+                }
                 _state.value = _state.value.copy(
                     words = listCacheFlow.value.reversed(),
                     isSearching = false,
                     query = ""
                 )
-            }
-        }
-    }
 
-    fun onResume() {
-        viewModelScope.launch {
-            _state.value.infoItem.let { itemClicked ->
-                _state.value = SearchState(
-                    query = _state.value.query,
-                    isHintVisible = _state.value.isHintVisible,
-                    isSearching = _state.value.isSearching,
-                    words = _state.value.words,
-                    openDialog = _state.value.openDialog,
-                    infoItem = InfoItemClicked(
-                        word = itemClicked.word,
-                        meanings = itemClicked.meanings,
-                        audio = itemClicked.audio,)
-                )
             }
         }
     }
