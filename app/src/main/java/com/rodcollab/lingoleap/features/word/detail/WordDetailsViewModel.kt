@@ -34,8 +34,7 @@ data class DefinitionDomain(
 
 @HiltViewModel
 class WordDetailsViewModel @Inject constructor(
-    private val translation: TranslatorApiService,
-    private val repository: TranslationRepository,
+    private val songs: GetSongsUseCase,
     private val getMeaningsUseCase: GetMeaningsUseCase,
     private val getWordUseCase: GetWordDetailsUseCase,
     savedStateHandle: SavedStateHandle
@@ -75,7 +74,23 @@ class WordDetailsViewModel @Inject constructor(
                     audio = it.audio,
                     partOfSpeech = partOfSpeech,
                     partOfSpeeches = it.partOfSpeeches,
-                    definitionsAndExamples = getMeaningsUseCase(_wordId,partOfSpeech),
+                    definitionsAndExamples = getMeaningsUseCase(_wordId, partOfSpeech),
+                    songs = it.songs
+                )
+            }
+        }
+    }
+
+    fun getSongs() {
+        viewModelScope.launch {
+            wordDetailsStateUi.update {
+                WordDetailsUiState(
+                    word = it.word,
+                    audio = it.audio,
+                    partOfSpeech = it.partOfSpeech,
+                    partOfSpeeches = it.partOfSpeeches,
+                    definitionsAndExamples = it.definitionsAndExamples,
+                    songs = songs(_wordId)
                 )
             }
         }

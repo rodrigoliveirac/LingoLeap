@@ -6,6 +6,8 @@ import com.rodcollab.lingoleap.features.search.domain.GetWordUseCase
 import com.rodcollab.lingoleap.features.search.domain.GetWordUseCaseImpl
 import com.rodcollab.lingoleap.features.word.detail.GetMeaningsUseCase
 import com.rodcollab.lingoleap.features.word.detail.GetMeaningsUseCaseImpl
+import com.rodcollab.lingoleap.features.word.detail.GetSongsUseCase
+import com.rodcollab.lingoleap.features.word.detail.GetSongsUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,4 +29,8 @@ abstract class UseCasesModule {
     @Singleton
     @Binds
     abstract fun providesGetMeaningsUseCase(impl: GetMeaningsUseCaseImpl): GetMeaningsUseCase
+
+    @Singleton
+    @Binds
+    abstract fun providesGetSongsUseCase(impl: GetSongsUseCaseImpl): GetSongsUseCase
 }

@@ -4,6 +4,8 @@ import com.rodcollab.lingoleap.WordDetailsRepository
 import com.rodcollab.lingoleap.WordDetailsRepositoryImpl
 import com.rodcollab.lingoleap.features.history.repository.SearchHistory
 import com.rodcollab.lingoleap.features.history.repository.SearchHistoryImpl
+import com.rodcollab.lingoleap.features.word.detail.SongsRepository
+import com.rodcollab.lingoleap.features.word.detail.SongsRepositoryImpl
 import com.rodcollab.lingoleap.features.word.translation.TranslationRepository
 import com.rodcollab.lingoleap.features.word.translation.TranslationRepositoryImpl
 import dagger.Binds
@@ -27,5 +29,9 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun providesWordDetailsRepositoryImpl(impl: WordDetailsRepositoryImpl): WordDetailsRepository
+
+    @Singleton
+    @Binds
+    abstract fun providesSongsRepositoryImpl(impl: SongsRepositoryImpl) : SongsRepository
 
 }
