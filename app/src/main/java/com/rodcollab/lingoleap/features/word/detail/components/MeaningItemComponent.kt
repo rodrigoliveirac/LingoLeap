@@ -1,5 +1,6 @@
 package com.rodcollab.lingoleap.features.word.detail.components
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -70,6 +71,7 @@ fun MeaningItemComponent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+
             TabRow(actualPage)
 
             HorizontalPager(
@@ -77,22 +79,12 @@ fun MeaningItemComponent(
             ) { page ->
                 when (page) {
                     0 -> {
-                        DefinitionsPage(definition = definition)
+                        DefinitionsPage(definition = definition, translate = {Log.d("definitions", it) })
                     }
 
-                    1 -> SentencesPage(sentence = example)
+                    1 -> SentencesPage(sentence = example, translate = { Log.d("sentences", it)})
                 }
             }
-
-            /*if (arrowClicked) {
-                Text(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
-                    text = "Translate to"
-                )
-
-                TranslateComponent({ }, emptyList(), isLoading, definition)
-            }*/
         }
     }
 }
@@ -135,12 +127,7 @@ private fun TabRow(actualPage: Int) {
                 )
                 .padding(bottom = 8.dp), text = "Sentences"
         )
-        Spacer(
-            modifier = Modifier
-                .align(Alignment.Bottom)
-                .weight(1f)
-                .height(1.dp)
-                .background(Color.LightGray)
-        )
+
+
     }
 }

@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import com.rodcollab.lingoleap.features.word.translation.ItemComponent
 
 @Composable
-fun SentencesPage(sentence: String) {
-    ItemComponent(text = sentence)
+fun SentencesPage(sentence: String, translate: (String) -> Unit) {
+    ItemComponent(text = sentence, translate = translate)
 }
 
 @Composable
-fun DefinitionsPage(definition: String) {
-    ItemComponent(text = definition)
+fun DefinitionsPage(definition: String, translate: (String) -> Unit) {
+    ItemComponent(text = definition, translate = translate)
 }
