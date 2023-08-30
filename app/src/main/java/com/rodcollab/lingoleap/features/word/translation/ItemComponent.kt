@@ -20,21 +20,31 @@ import androidx.compose.ui.unit.dp
 fun ItemComponent(text: String) {
 
     var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 24.dp, bottom = 8.dp, end = 16.dp),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(5.dp)
-    ) {
-        Text(
+        Card(
             modifier = Modifier
-                .clickable { expanded = !expanded }
-                .padding(16.dp),
-            text = text,
-            maxLines = if (expanded) Int.MAX_VALUE else 1,
-            overflow = if (expanded) TextOverflow.Visible else TextOverflow.Ellipsis
-        )
-    }
+                .fillMaxWidth()
+                .padding(start = 8.dp, top = 18.dp, end = 8.dp),
+            shape = MaterialTheme.shapes.medium,
+            elevation = CardDefaults.cardElevation(5.dp)
+        ) {
+            Row {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth().weight(1f)
+                        .clickable { expanded = !expanded }
+                        .padding(16.dp),
+                    text = text.ifBlank { "We couldn't find an example for this context :/" },
+                    maxLines = if (expanded) Int.MAX_VALUE else 1,
+                    overflow = if (expanded) TextOverflow.Visible else TextOverflow.Ellipsis
+                )
+                if(text.isNotBlank()) {
+                    IconButton(modifier = Modifier.align(Alignment.CenterVertically).padding(end = 16.dp),onClick = { translate(text) }) {
+                        Icon(
+                            painterResource(id = R.drawable.icon),
+                            contentDescription = null,
+                        )
+                    }
+                }
+            }
+        }
 }
