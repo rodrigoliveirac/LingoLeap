@@ -20,10 +20,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.rodcollab.lingoleap.features.history.HistoryScreen
-import com.rodcollab.lingoleap.features.word.detail.WordDetailScreen
 import com.rodcollab.lingoleap.features.search.SearchScreen
+import com.rodcollab.lingoleap.features.word.detail.WordDetailScreen
 import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -36,9 +37,23 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val scaffoldState = rememberScaffoldState()
 
+                var hide  by remember { mutableStateOf(false)}
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    bottomBar = { LayoutBasicBottomNavigation(navController) },
+                    bottomBar = {
+
+                        var display by remember { mutableStateOf(false) }
+
+                        LaunchedEffect(hide) {
+                            delay(50)
+                            display = hide
+                        }
+                        if (!display) {
+                            LayoutBasicBottomNavigation(navController)
+                        }
+
+                    },
                     scaffoldState = scaffoldState,
                 ) { paddingValues ->
                     NavHost(navController = navController, startDestination = "search") {
@@ -66,8 +81,12 @@ class MainActivity : ComponentActivity() {
                             "word_details/{word}",
                             arguments = listOf(navArgument("word") { type = NavType.StringType })
                         ) {
-                            WordDetailScreen(
-                                onNavigateBack = { navController.navigateUp() })
+                             WordDetailScreen(
+                                hideNavBar = { hide = true },
+                                onNavigateBack = {
+                                    hide = false
+                                    navController.navigateUp()
+                                })
                         }
                     }
                 }
