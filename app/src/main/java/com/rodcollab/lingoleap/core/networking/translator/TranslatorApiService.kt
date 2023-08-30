@@ -1,4 +1,4 @@
-package com.rodcollab.lingoleap
+package com.rodcollab.lingoleap.core.networking.translator
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
