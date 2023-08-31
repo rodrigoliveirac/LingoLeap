@@ -1,6 +1,5 @@
 package com.rodcollab.lingoleap.features.word.detail.components
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +31,7 @@ import com.rodcollab.lingoleap.features.word.detail.bottomBorder
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun MeaningItemComponent(
+    translate :(String) -> Unit,
     definition: String,
     example: String
 ) {
@@ -79,10 +79,10 @@ fun MeaningItemComponent(
             ) { page ->
                 when (page) {
                     0 -> {
-                        DefinitionsPage(definition = definition, translate = {Log.d("definitions", it) })
+                        DefinitionsPage(definition = definition, translate = { translate(it) } )
                     }
 
-                    1 -> SentencesPage(sentence = example, translate = { Log.d("sentences", it)})
+                    1 -> SentencesPage(sentence = example, translate = { translate(it) })
                 }
             }
         }

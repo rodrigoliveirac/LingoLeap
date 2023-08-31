@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rodcollab.lingoleap.GetWordDetailsUseCase
+import com.rodcollab.lingoleap.features.GetLanguages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class WordDetailsUiState(
@@ -19,7 +21,10 @@ data class WordDetailsUiState(
     val partOfSpeech: String = "",
     val partOfSpeeches: List<String> = listOf(),
     val definitionsAndExamples: List<DefinitionDomain> = listOf(),
-    val songs: List<SongDomain> = listOf()
+    val songs: List<SongDomain> = listOf(),
+    val translatedText: String = "",
+    val textToTranslate: String = "",
+    val languages: List<LanguageOption> = listOf()
 )
 
 data class SongDomain(
@@ -34,6 +39,8 @@ data class DefinitionDomain(
 
 @HiltViewModel
 class WordDetailsViewModel @Inject constructor(
+    private val translator: TranslatorUseCase,
+    private val languages: GetLanguages,
     private val songs: GetSongsUseCase,
     private val getMeaningsUseCase: GetMeaningsUseCase,
     private val getWordUseCase: GetWordDetailsUseCase,
@@ -46,7 +53,8 @@ class WordDetailsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 
             val dataSource = getWordUseCase(_wordId)
-            wordDetailsStateUi.update {
+
+            _uiState.update {
                 WordDetailsUiState(
                     word = dataSource.word,
                     audio = dataSource.audio,
@@ -56,19 +64,20 @@ class WordDetailsViewModel @Inject constructor(
                         _wordId,
                         dataSource.partOfSpeech[0]
                     ),
-                    songs = emptyList()
+                    songs = emptyList(),
+                    languages = emptyList()
                 )
             }
         }
     }
 
-    private val wordDetailsStateUi = MutableStateFlow(WordDetailsUiState())
+    private val _uiState = MutableStateFlow(WordDetailsUiState())
 
-    val word: StateFlow<WordDetailsUiState> = wordDetailsStateUi.asStateFlow()
+    val uiState: StateFlow<WordDetailsUiState> = _uiState.asStateFlow()
 
     fun getDefinitionsBy(partOfSpeech: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            wordDetailsStateUi.update {
+            _uiState.update {
                 WordDetailsUiState(
                     word = it.word,
                     audio = it.audio,
@@ -83,7 +92,7 @@ class WordDetailsViewModel @Inject constructor(
 
     fun getSongs() {
         viewModelScope.launch {
-            wordDetailsStateUi.update {
+            _uiState.update {
                 WordDetailsUiState(
                     word = it.word,
                     audio = it.audio,
@@ -93,6 +102,20 @@ class WordDetailsViewModel @Inject constructor(
                     songs = songs(_wordId)
                 )
             }
+        }
+    }
+
+    fun translate(targetSource: String, text: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                _uiState.value = _uiState.value.copy(translatedText = "")
+            }
+            val translatedText = translator(targetSource, text)
+            _uiState.value = _uiState.value.copy(
+                languages = languages(),
+                translatedText = translatedText,
+                textToTranslate = text
+            )
         }
     }
 
