@@ -29,17 +29,11 @@ import java.util.*
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WordDetailScreen(
-    hideNavBar: () -> Unit,
     onNavigateBack: () -> Unit,
     wordDetailsViewModel: WordDetailsViewModel = hiltViewModel()
 ) {
 
-    DisposableEffect(Unit) {
-        hideNavBar()
-        onDispose { }
-    }
-
-    val wordDetailsUiState by wordDetailsViewModel.word.collectAsState()
+    val wordDetailsUiState by wordDetailsViewModel.uiState.collectAsState()
 
     val pagerState = rememberPagerState(pageCount = {
         2
