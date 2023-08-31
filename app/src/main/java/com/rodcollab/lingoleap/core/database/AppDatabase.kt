@@ -7,11 +7,14 @@ import androidx.room.RoomDatabase
 import com.rodcollab.lingoleap.core.networking.dictionary.model.DefinitionEntity
 import com.rodcollab.lingoleap.core.networking.dictionary.model.MeaningEntity
 import com.rodcollab.lingoleap.core.networking.dictionary.model.WordEntity
+import com.rodcollab.lingoleap.features.word.translation.LanguageEntity
+import com.rodcollab.lingoleap.features.word.translation.LanguagesDao
 
-@Database(entities = [WordEntity::class, MeaningEntity::class, DefinitionEntity::class], version = 8, exportSchema = false)
+@Database(entities = [WordEntity::class, MeaningEntity::class, DefinitionEntity::class, LanguageEntity::class], version = 9, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun searchHistoryDao() : SearchHistoryDao
+    abstract fun languageDao() : LanguagesDao
 
     companion object {
         private var instance: AppDatabase? = null
