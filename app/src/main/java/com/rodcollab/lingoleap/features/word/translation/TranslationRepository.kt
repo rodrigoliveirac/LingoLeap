@@ -1,95 +1,67 @@
 package com.rodcollab.lingoleap.features.word.translation
 
-import com.google.firebase.firestore.FirebaseFirestore
-import com.rodcollab.lingoleap.TranslatorApiService
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.rodcollab.lingoleap.core.networking.translator.TranslatorApiService
 import com.rodcollab.lingoleap.features.word.detail.LanguageOption
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 interface TranslationRepository {
 
-    suspend fun loadLanguages(successfully: (List<LanguageOption>) -> Unit)
+    suspend fun translate(targetLanguage: String, text: String): String
+    suspend fun fetchLanguagesFromLocal(): List<LanguageOption>
+    suspend fun fetchLanguagesFromApi(): List<LanguageOption>
+    suspend fun insertToLocal(language: LanguageOption)
 
 }
 
 class TranslationRepositoryImpl @Inject constructor(
+    private val dao: LanguagesDao,
     private val translationService: TranslatorApiService,
-    private val firebase: FirebaseFirestore,
 ) : TranslationRepository {
-
-    private val _languagesCache = mutableListOf<LanguageOption>()
-
-    private val _languagesFlow = MutableStateFlow(_languagesCache)
-
-    override suspend fun loadLanguages(successfully: (List<LanguageOption>) -> Unit) {
-
-        withContext(Dispatchers.IO) {
-            val result =
-                firebase.collection("SUPPORTED_LANGUAGES").get().addOnSuccessListener { documents ->
-                }.await()
-            if (result.isEmpty) {
-                addFromApiMock {
-                    addToCollection {
-                        successfully(_languagesFlow.value)
-                    }
-                }
-            } else {
-                fetchLanguages {
-                    successfully(it.sortedBy { option -> option.name })
-                }
-            }
+    override suspend fun translate(targetLanguage: String, text: String): String {
+        val translatedText = withContext(Dispatchers.IO) {
+            translationService.translate(targetLanguage, "en", text)
         }
+        if (translatedText.isSuccessful) {
+            return translatedText.body()!!.data.translatedText
+        }
+        return ""
     }
 
-    private suspend fun addToCollection(finished: () -> Unit) {
-        withContext(Dispatchers.IO) {
-            _languagesFlow.value.map {
-                firebase.collection("SUPPORTED_LANGUAGES").add(it)
-            }
-            finished()
-        }
+
+    override suspend fun fetchLanguagesFromLocal(): List<LanguageOption> = dao.fetchAll().map {
+        LanguageOption(
+            code = it.code,
+            name = it.name
+        )
     }
 
-    private suspend fun addFromApiMock(finished: suspend () -> Unit) {
-
-        withContext(Dispatchers.IO) {
-//            val result = translationService.getLanguages()
-//            if (result.isSuccessful) {
-//                result.body()?.data?.languages?.map {
-//                    _languagesCache.add(LanguageOption(code = it.code, name = it.name))
-//                    _languagesFlow.value = _languagesCache
-//                }
-//                finished()
-//            }
+    override suspend fun fetchLanguagesFromApi(): List<LanguageOption> =
+        translationService.getLanguages().body()!!.data.languages.map {
+            LanguageOption(
+                code = it.code,
+                name = it.name
+            )
         }
-    }
 
-    private suspend fun fetchLanguages(successfully: (List<LanguageOption>) -> Unit) {
-        withContext(Dispatchers.IO) {
-
-            if (_languagesCache.isEmpty()) {
-                val result =
-                    firebase.collection("SUPPORTED_LANGUAGES").get().addOnSuccessListener { docs ->
-
-                    }.await()
-
-
-                result.map {
-                    _languagesCache.add(
-                        LanguageOption(
-                            code = it.getString("code")!!,
-                            name = it.getString("name")!!
-                        )
-                    )
-                    _languagesFlow.value
-                }
-                successfully(_languagesFlow.value)
-            } else {
-                successfully(_languagesFlow.value)
-            }
-        }
+    override suspend fun insertToLocal(language: LanguageOption) {
+        dao.insert(language.toLanguageEntity(language))
     }
 
 }
+
+fun LanguageOption.toLanguageEntity(language: LanguageOption): LanguageEntity =
+    LanguageEntity(
+        code = language.code,
+        name = language.name
+    )
+
+
+@Entity(tableName = "language")
+data class LanguageEntity(
+    @PrimaryKey val code: String,
+    @ColumnInfo("name") val name: String
+)
