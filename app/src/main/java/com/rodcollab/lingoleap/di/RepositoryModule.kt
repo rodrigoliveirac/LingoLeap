@@ -1,11 +1,13 @@
 package com.rodcollab.lingoleap.di
 
-import com.rodcollab.lingoleap.TranslationRepository
-import com.rodcollab.lingoleap.TranslationRepositoryImpl
-import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepository
-import com.rodcollab.lingoleap.collections.saved.repository.WordsSavedRepositoryImpl
-import com.rodcollab.lingoleap.collections.history.repository.SearchHistory
-import com.rodcollab.lingoleap.collections.history.repository.SearchHistoryImpl
+import com.rodcollab.lingoleap.WordDetailsRepository
+import com.rodcollab.lingoleap.WordDetailsRepositoryImpl
+import com.rodcollab.lingoleap.features.history.repository.SearchHistory
+import com.rodcollab.lingoleap.features.history.repository.SearchHistoryImpl
+import com.rodcollab.lingoleap.features.word.detail.SongsRepository
+import com.rodcollab.lingoleap.features.word.detail.SongsRepositoryImpl
+import com.rodcollab.lingoleap.features.word.translation.TranslationRepository
+import com.rodcollab.lingoleap.features.word.translation.TranslationRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -18,14 +20,18 @@ abstract class RepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun providesWordsSavedImpl(impl: WordsSavedRepositoryImpl): WordsSavedRepository
+    abstract fun providesSearchHistoryImpl(impl: SearchHistoryImpl): SearchHistory
 
     @Singleton
     @Binds
-    abstract fun providesSearchHistoryImpl(impl: SearchHistoryImpl) : SearchHistory
+    abstract fun providesTranslationImpl(impl: TranslationRepositoryImpl): TranslationRepository
 
     @Singleton
     @Binds
-    abstract fun providesTranslationImpl(impl: TranslationRepositoryImpl) : TranslationRepository
+    abstract fun providesWordDetailsRepositoryImpl(impl: WordDetailsRepositoryImpl): WordDetailsRepository
+
+    @Singleton
+    @Binds
+    abstract fun providesSongsRepositoryImpl(impl: SongsRepositoryImpl) : SongsRepository
 
 }

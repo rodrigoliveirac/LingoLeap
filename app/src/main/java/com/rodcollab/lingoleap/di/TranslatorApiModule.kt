@@ -1,8 +1,8 @@
 package com.rodcollab.lingoleap.di
 
-import com.rodcollab.lingoleap.ApiKeyInterceptor
-import com.rodcollab.lingoleap.TranslatorApiService
-import com.rodcollab.lingoleap.TranslatorApiService.Companion.BASE_URL
+import com.rodcollab.lingoleap.core.networking.dictionary.ApiKeyInterceptor
+import com.rodcollab.lingoleap.core.networking.translator.TranslatorApiService
+import com.rodcollab.lingoleap.core.networking.translator.TranslatorApiService.Companion.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,9 +25,10 @@ object TranslatorApiModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(apiKeyInterceptor: ApiKeyInterceptor): OkHttpClient {
+    fun provideOkHttpClient(apiKeyInterceptor: ApiKeyInterceptor, apiKeyInterceptorLyrics: ApiKeyInterceptorLyricsApi): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiKeyInterceptor)
+            .addInterceptor(apiKeyInterceptorLyrics)
             .build()
     }
 
