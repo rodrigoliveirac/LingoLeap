@@ -22,7 +22,8 @@ That's the new way to learn english! :)
     ```
  ## Screenshots📱
  
-<img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/Screenshot_SearchWord.png" width="188" height="412">$~~~~~~~~~~~~~~~~~~~~~~$ <img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/Screenshot_WordDetails.png" width="188" height="412"> $~~~~~~~~~~~~~~~~~~~~~~$ <img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/lastUpdatesLingo.gif" width="188" height="412"> 
+<img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/Screenshot_SearchWord.png" width="188" height="412">$~~~~~~~~~~~~~~~~~~~~~~$ <img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/Screenshot_WordDetails.png" width="188" height="412"> $~~~~~~~~~~~~~~~~~~~~~~$ <img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/songs_list_1.gif" width="188" height="412"> $~~~~~~~~~~~~~~~~~~~~~~$
+<img src="https://github.com/rodrigoliveirac/LingoLeap/blob/master/translation_video_1.gif" width="188" height="412">
 	
 ## Technologies 🛠️
 This Project is created with:
