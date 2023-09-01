@@ -83,7 +83,7 @@ fun MainWordDetailsPagerComponent(
     var originText by remember { mutableStateOf("") }
 
     if (showDialog) {
-        MinimalDialog(wordDetailsViewModel,originText, wordDetailsUiState) { showDialog = false }
+        MinimalDialog(wordDetailsViewModel, originText, wordDetailsUiState) { showDialog = false }
     }
 
     LaunchedEffect(actualPartOfSpeech) {
@@ -121,12 +121,13 @@ fun MainWordDetailsPagerComponent(
             wordDetailsViewModel,
             actualPartOfSpeech = { actualPartOfSpeech = it })
 
-        IconButton(onClick = { }) {
+        IconButton(onClick = { wordDetailsViewModel.playAudio() }, enabled = wordDetailsUiState.audio.isNotBlank()) {
             Icon(
                 modifier = Modifier
                     .padding(top = 16.dp, bottom = 24.dp),
                 imageVector = Icons.Default.VolumeUp,
-                contentDescription = null
+                contentDescription = null,
+                tint = if(wordDetailsUiState.audio.isNotBlank()) Color.Black else Color.LightGray
             )
         }
 

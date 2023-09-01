@@ -1,5 +1,7 @@
 package com.rodcollab.lingoleap.features.word.detail
 
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -116,6 +118,25 @@ class WordDetailsViewModel @Inject constructor(
                 translatedText = translatedText,
                 textToTranslate = text
             )
+        }
+    }
+
+    fun playAudio() {
+        viewModelScope.launch(Dispatchers.IO) {
+            MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                setDataSource(uiState.value.audio)
+                prepare()
+                start()
+
+            }.setOnCompletionListener {
+                it.release()
+            }
         }
     }
 
