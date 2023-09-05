@@ -34,6 +34,7 @@ import androidx.navigation.navArgument
 import com.rodcollab.lingoleap.features.history.HistoryScreen
 import com.rodcollab.lingoleap.features.search.SearchScreen
 import com.rodcollab.lingoleap.features.word.detail.WordDetailScreen
+import com.rodcollab.lingoleap.features.word.practice.PracticeScreen
 import com.rodcollab.lingoleap.ui.theme.LingoLeapTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -53,7 +54,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
 
-                        if (currentRoute(navController = navController) == "search" || currentRoute(navController = navController) == "history") {
+                        if (currentRoute(navController = navController) == "search" || currentRoute(
+                                navController = navController
+                            ) == "history"
+                        ) {
                             LayoutBasicBottomNavigation(navController)
                         }
 
@@ -85,10 +89,19 @@ class MainActivity : ComponentActivity() {
                             "word_details/{word}",
                             arguments = listOf(navArgument("word") { type = NavType.StringType })
                         ) {
-                             WordDetailScreen(
+                            WordDetailScreen(
+                                toPractice = { word -> navController.navigate("practice/$word") },
                                 onNavigateBack = {
                                     navController.navigateUp()
                                 })
+                        }
+                        composable(
+                            "practice/{word}",
+                            arguments = listOf(navArgument("word") { type = NavType.StringType })
+                            ) {
+                            PracticeScreen(
+                                onNavigateBack = { navController.navigateUp() }
+                            )
                         }
                     }
                 }

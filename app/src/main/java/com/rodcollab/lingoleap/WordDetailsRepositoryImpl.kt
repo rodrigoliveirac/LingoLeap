@@ -12,6 +12,8 @@ interface WordDetailsRepository {
     suspend fun getPartOfSpeeches(word: String): List<String>
 
     suspend fun getMeanings(word: String, partOfSpeech: String): List<DefinitionDomain>
+
+    suspend fun getAllMeaningsFromWord(word: String): List<DefinitionDomain>
 }
 
 class WordDetailsRepositoryImpl @Inject constructor(private val dao: SearchHistoryDao) :
@@ -26,6 +28,15 @@ class WordDetailsRepositoryImpl @Inject constructor(private val dao: SearchHisto
             DefinitionDomain(
                 definition = it.definition,
                 example = it.example
+            )
+        }
+    }
+
+    override suspend fun getAllMeaningsFromWord(word: String): List<DefinitionDomain> {
+        return dao.definitionsBy(word).map { meaning ->
+            DefinitionDomain(
+                definition = meaning.definition,
+                example = meaning.example
             )
         }
     }

@@ -12,6 +12,10 @@ import com.rodcollab.lingoleap.features.word.detail.GetSongsUseCase
 import com.rodcollab.lingoleap.features.word.detail.GetSongsUseCaseImpl
 import com.rodcollab.lingoleap.features.word.detail.TranslatorUseCase
 import com.rodcollab.lingoleap.features.word.detail.TranslatorUseCaseImpl
+import com.rodcollab.lingoleap.features.word.practice.GameManager
+import com.rodcollab.lingoleap.features.word.practice.GameManagerImpl
+import com.rodcollab.lingoleap.features.word.practice.GetQuestion
+import com.rodcollab.lingoleap.features.word.practice.GetQuestionImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -45,5 +49,13 @@ abstract class UseCasesModule {
     @Singleton
     @Binds
     abstract fun providesGetLanguages(impl: GetLanguagesImpl) : GetLanguages
+
+    @Singleton
+    @Binds
+    abstract fun providesGetQuestion(impl: GetQuestionImpl) : GetQuestion
+
+    @Singleton
+    @Binds
+    abstract fun providesGameManager(impl : GameManagerImpl) : GameManager
 
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -29,6 +30,7 @@ import java.util.*
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WordDetailScreen(
+    toPractice: (String) -> Unit,
     onNavigateBack: () -> Unit,
     wordDetailsViewModel: WordDetailsViewModel = hiltViewModel()
 ) {
@@ -47,6 +49,8 @@ fun WordDetailScreen(
     var scroll by remember { mutableStateOf(false) }
 
     var goTo by remember { mutableStateOf(false) }
+
+    var expanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(scroll) {
         if (goTo) {
@@ -69,7 +73,23 @@ fun WordDetailScreen(
             }) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
             }
-            Text(text = stringResource(R.string.word_details_title))
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f), text = stringResource(R.string.word_details_title)
+            )
+            Column {
+                IconButton(onClick = {
+                    expanded = !expanded
+                }) {
+                    Icon(imageVector = Icons.Default.MoreVert, contentDescription = null)
+                }
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = !expanded }) {
+                    DropdownMenuItem(onClick = { toPractice(wordDetailsUiState.word) }) {
+                        Text(text = "Practice")
+                    }
+                }
+            }
         }
     }) {
         Box(
