@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SearchHistoryDao {
 
+
+    @Query("UPDATE word SET marked = :mark WHERE word = :word")
+    suspend fun onToggleMark(word: String,mark: Int)
     @Insert
     suspend fun addDefinition(definition: DefinitionEntity)
     @Insert

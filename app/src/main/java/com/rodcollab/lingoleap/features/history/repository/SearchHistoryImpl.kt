@@ -25,6 +25,7 @@ class SearchHistoryImpl @Inject constructor(
                 }
             }
 
+
             dao.addWord(WordEntity(word.name, audio))
 
             word.arrayInformation.map { infoWord ->

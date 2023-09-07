@@ -22,6 +22,7 @@ data class Definition(
 data class WordEntity(
     @PrimaryKey val word: String,
     val audio: String,
+    val marked: Int = 0
 )
 
 @Entity(tableName = "meaning")
@@ -29,15 +30,6 @@ data class MeaningEntity(
     @PrimaryKey val meaningId: String,
     @ColumnInfo("wordCreatorId")val wordCreatorId: String?,
     @ColumnInfo("partOfSpeech")val partOfSpeech: String?
-)
-
-data class WordWithMeanings(
-    @Embedded val word: WordEntity,
-    @Relation(
-        parentColumn = "word",
-        entityColumn = "wordCreatorId"
-    )
-    val meanings: List<MeaningEntity>
 )
 
 @Entity(tableName = "definition")

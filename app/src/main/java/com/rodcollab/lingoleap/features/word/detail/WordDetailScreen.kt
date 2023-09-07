@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rodcollab.lingoleap.R
 import com.rodcollab.lingoleap.features.word.detail.components.MainWordDetailsPagerComponent
@@ -61,7 +62,6 @@ fun WordDetailScreen(
         }
     }
 
-
     Scaffold(topBar = {
         TopAppBar() {
             IconButton(onClick = {
@@ -72,30 +72,44 @@ fun WordDetailScreen(
             Text(text = stringResource(R.string.word_details_title))
         }
     }) {
+
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(it)
         ) {
-            VerticalPager(state = pagerState) { page ->
-                when (page) {
-                    0 -> {
-                        MainWordDetailsPagerComponent(
-                            toSongsPager = {
-                                scroll = true
-                                goTo = true
-                            },
-                            wordDetailsUiState,
-                            wordDetailsViewModel,
-                        )
-                    }
+            if (wordDetailsUiState.isLoading) {
+                LinearProgressIndicator(
+                    color = Color(
+                        250,
+                        128,
+                        46
+                    ), modifier = Modifier
+                        .height(10.dp)
+                        .fillMaxWidth()
+                        .padding(start = 12.dp, top = 8.dp, end = 24.dp)
+                )
+            } else {
+                VerticalPager(state = pagerState) { page ->
+                    when (page) {
+                        0 -> {
+                            MainWordDetailsPagerComponent(
+                                toSongsPager = {
+                                    scroll = true
+                                    goTo = true
+                                },
+                                wordDetailsUiState,
+                                wordDetailsViewModel,
+                            )
+                        }
 
-                    1 -> {
-                        SongsWordDetailsPagerComponent(wordDetailsUiState)
-                        scroll = false
+                        1 -> {
+                            SongsWordDetailsPagerComponent(wordDetailsUiState)
+                            scroll = false
+                        }
                     }
                 }
             }
-
         }
     }
 }

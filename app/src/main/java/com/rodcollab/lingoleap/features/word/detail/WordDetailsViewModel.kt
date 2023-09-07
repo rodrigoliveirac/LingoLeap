@@ -12,14 +12,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class WordDetailsUiState(
+    val isLoading: Boolean = true,
     val word: String = "",
     val audio: String = "",
+    val marked: Int = -1,
     val partOfSpeech: String = "",
     val partOfSpeeches: List<String> = listOf(),
     val definitionsAndExamples: List<DefinitionDomain> = listOf(),
@@ -30,6 +33,7 @@ data class WordDetailsUiState(
 )
 
 data class SongDomain(
+    val word: String = "",
     val title: String,
     val thumbnailUrl: String
 )
@@ -54,21 +58,33 @@ class WordDetailsViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
 
-            val dataSource = getWordUseCase(_wordId)
+            val flow = flow {
+                emit(getWordUseCase(_wordId))
+            }
+            val songs = flow {
+                emit(songs(_wordId))
+            }
 
-            _uiState.update {
-                WordDetailsUiState(
-                    word = dataSource.word,
-                    audio = dataSource.audio,
-                    partOfSpeech = dataSource.partOfSpeech[0],
-                    partOfSpeeches = dataSource.partOfSpeech,
-                    definitionsAndExamples = getMeaningsUseCase(
-                        _wordId,
-                        dataSource.partOfSpeech[0]
-                    ),
-                    songs = emptyList(),
-                    languages = emptyList()
-                )
+            flow.collect { word ->
+                songs.collect { songs ->
+                    _uiState.update {
+                        WordDetailsUiState(
+                            isLoading = false,
+                            word = _wordId,
+                            audio = word.audio,
+                            marked = word.marked,
+                            partOfSpeech = word.partOfSpeech[0],
+                            partOfSpeeches = word.partOfSpeech,
+                            definitionsAndExamples = getMeaningsUseCase(
+                                _wordId,
+                                word.partOfSpeech[0]
+                            ),
+                            songs = songs,
+                            languages = emptyList()
+                        )
+                    }
+                }
+
             }
         }
     }
@@ -93,9 +109,10 @@ class WordDetailsViewModel @Inject constructor(
     }
 
     fun getSongs() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
                 WordDetailsUiState(
+                    isLoading = it.isLoading,
                     word = it.word,
                     audio = it.audio,
                     partOfSpeech = it.partOfSpeech,
@@ -136,6 +153,24 @@ class WordDetailsViewModel @Inject constructor(
 
             }.setOnCompletionListener {
                 it.release()
+            }
+        }
+    }
+
+    fun markWord() {
+        viewModelScope.launch(Dispatchers.IO) {
+            getWordUseCase.onToggleMark(_wordId)
+            _uiState.update {
+                WordDetailsUiState(
+                    isLoading = it.isLoading,
+                    word = it.word,
+                    audio = it.audio,
+                    marked = getWordUseCase(_wordId).marked,
+                    partOfSpeech = it.partOfSpeech,
+                    partOfSpeeches = it.partOfSpeeches,
+                    definitionsAndExamples = it.definitionsAndExamples,
+                    songs = it.songs
+                )
             }
         }
     }

@@ -34,6 +34,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.VolumeUp
@@ -82,6 +84,8 @@ fun MainWordDetailsPagerComponent(
 
     var originText by remember { mutableStateOf("") }
 
+    var marked by remember { mutableStateOf(false) }
+
     if (showDialog) {
         MinimalDialog(wordDetailsViewModel, originText, wordDetailsUiState) { showDialog = false }
     }
@@ -109,11 +113,21 @@ fun MainWordDetailsPagerComponent(
 
         Row {
             Text(
-                modifier = Modifier.padding(start = 12.dp),
+                modifier = Modifier.fillMaxWidth().align(Alignment.CenterVertically).weight(1f).padding(start = 12.dp),
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                text = wordDetailsUiState.word
+                text = wordDetailsUiState.word.replaceFirstChar { it.uppercaseChar() }
             )
+            IconButton(onClick = { wordDetailsViewModel.markWord() }) {
+                Icon(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(8.dp),
+                    imageVector = if(wordDetailsUiState.marked == 1) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                    contentDescription = "Mark Icon Button",
+                    tint = Color(250, 128, 46)
+                )
+            }
         }
 
         PartOfSpeechesRow(

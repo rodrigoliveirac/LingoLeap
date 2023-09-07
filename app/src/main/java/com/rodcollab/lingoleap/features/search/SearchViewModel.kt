@@ -73,7 +73,6 @@ class SearchViewModel @Inject constructor(
 
 
             withContext(Dispatchers.IO) {
-
                 try {
                     getWord(_state.value.query).map { infoItem ->
                         listCache.add(WordItemUiState(element = infoItem))
