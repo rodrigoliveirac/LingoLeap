@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,14 +53,15 @@ fun SearchScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
         if(state.isSearching) {
-            CircularProgressIndicator(
-                strokeWidth = 1.dp,
-                strokeCap = StrokeCap.Square,
-                color = Color(255, 20, 147),
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .size(42.dp)
-                    .padding(start = 18.dp, top = 16.dp, bottom = 8.dp)
+            LinearProgressIndicator(
+                color = Color(
+                    250,
+                    128,
+                    46
+                ), modifier = Modifier
+                    .height(10.dp)
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 8.dp, end = 16.dp)
             )
         } else {
             Spacer(modifier = Modifier

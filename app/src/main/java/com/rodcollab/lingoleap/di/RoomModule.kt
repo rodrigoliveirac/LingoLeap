@@ -3,6 +3,7 @@ package com.rodcollab.lingoleap.di
 import android.app.Application
 import com.rodcollab.lingoleap.core.database.AppDatabase
 import com.rodcollab.lingoleap.core.database.SearchHistoryDao
+import com.rodcollab.lingoleap.core.database.SongDao
 import com.rodcollab.lingoleap.features.word.translation.LanguagesDao
 import dagger.Module
 import dagger.Provides
@@ -30,5 +31,11 @@ object RoomModule {
     @Provides
     fun providesLanguagesDao(database: AppDatabase) : LanguagesDao {
         return database.languageDao()
+    }
+
+    @Singleton
+    @Provides
+    fun providesSongsDao(database: AppDatabase) : SongDao {
+        return database.songDao()
     }
 }
