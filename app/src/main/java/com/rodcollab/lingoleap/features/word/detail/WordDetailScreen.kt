@@ -40,11 +40,6 @@ fun WordDetailScreen(
         2
     })
 
-    DisposableEffect(Unit) {
-        wordDetailsViewModel.getSongs()
-        onDispose { }
-    }
-
     var scroll by remember { mutableStateOf(false) }
 
     var goTo by remember { mutableStateOf(false) }

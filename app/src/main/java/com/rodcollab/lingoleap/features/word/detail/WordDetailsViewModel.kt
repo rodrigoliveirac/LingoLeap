@@ -108,22 +108,6 @@ class WordDetailsViewModel @Inject constructor(
         }
     }
 
-    fun getSongs() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update {
-                WordDetailsUiState(
-                    isLoading = it.isLoading,
-                    word = it.word,
-                    audio = it.audio,
-                    partOfSpeech = it.partOfSpeech,
-                    partOfSpeeches = it.partOfSpeeches,
-                    definitionsAndExamples = it.definitionsAndExamples,
-                    songs = songs(_wordId)
-                )
-            }
-        }
-    }
-
     fun translate(targetSource: String, text: String) {
         viewModelScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
