@@ -102,6 +102,7 @@ class WordDetailsViewModel @Inject constructor(
                     partOfSpeech = partOfSpeech,
                     partOfSpeeches = it.partOfSpeeches,
                     definitionsAndExamples = getMeaningsUseCase(_wordId, partOfSpeech),
+                    isLoading = false,
                     songs = it.songs
                 )
             }
